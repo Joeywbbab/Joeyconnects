@@ -293,17 +293,24 @@ export const WriteApp: React.FC = () => {
       const postsData = await Promise.all(postPromises);
       const validPosts = postsData.filter((p): p is Post => p !== null);
 
+      // If we found .md files but all failed to parse, throw error
+      if (files.filter(f => f.name && f.name.endsWith('.md')).length > 0 && validPosts.length === 0) {
+        throw new Error('All blog posts failed to load. Please check console for details.');
+      }
+
       validPosts.sort((a, b) => {
         const dateA = new Date(a.date || 0).getTime();
         const dateB = new Date(b.date || 0).getTime();
         return dateB - dateA;
       });
 
-      // Save to cache
-      localStorage.setItem(cacheKey, JSON.stringify({
-        data: validPosts,
-        timestamp: Date.now()
-      }));
+      // Only cache if we got posts successfully
+      if (validPosts.length > 0) {
+        localStorage.setItem(cacheKey, JSON.stringify({
+          data: validPosts,
+          timestamp: Date.now()
+        }));
+      }
 
       setPosts(validPosts);
     } catch (err) {
