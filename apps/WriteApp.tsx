@@ -300,7 +300,6 @@ export const WriteApp: React.FC = () => {
       });
 
       // Save to cache
-      const cacheKey = `blog-posts-${GITHUB_OWNER}-${GITHUB_REPO}`;
       localStorage.setItem(cacheKey, JSON.stringify({
         data: validPosts,
         timestamp: Date.now()
