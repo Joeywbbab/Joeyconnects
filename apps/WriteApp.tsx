@@ -3,7 +3,6 @@ import { List, RefreshCw } from 'lucide-react';
 import { Post, parseFrontmatter } from '../utils/markdown';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
 
 const GITHUB_OWNER = 'Joeywbbab';
 const GITHUB_REPO = 'Joeyconnects';
@@ -202,16 +201,21 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
           </span>
         </div>
 
-        <div className="prose prose-base max-w-none prose-headings:font-sans prose-headings:font-bold prose-h1:text-3xl prose-h1:mt-8 prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:my-6 prose-li:text-gray-700 prose-li:leading-relaxed">
+        <div className="prose prose-base max-w-none">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkBreaks]}
+            remarkPlugins={[remarkGfm]}
             components={{
-              h1: ({node, ...props}) => <h1 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
-              h2: ({node, ...props}) => <h2 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
-              h3: ({node, ...props}) => <h3 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
-              h4: ({node, ...props}) => <h4 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
-              h5: ({node, ...props}) => <h5 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
-              h6: ({node, ...props}) => <h6 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
+              h1: ({node, ...props}) => <h1 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="font-sans font-bold text-3xl mt-8 mb-6" {...props} />,
+              h2: ({node, ...props}) => <h2 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="font-sans font-bold text-2xl mt-8 mb-4" {...props} />,
+              h3: ({node, ...props}) => <h3 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="font-sans font-bold text-xl mt-6 mb-3" {...props} />,
+              h4: ({node, ...props}) => <h4 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="font-sans font-bold text-lg mt-4 mb-2" {...props} />,
+              h5: ({node, ...props}) => <h5 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="font-sans font-bold text-base mt-4 mb-2" {...props} />,
+              h6: ({node, ...props}) => <h6 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="font-sans font-bold text-sm mt-4 mb-2" {...props} />,
+              p: ({node, ...props}) => <p className="text-gray-700 leading-relaxed mb-6" {...props} />,
+              strong: ({node, ...props}) => <strong className="text-gray-900 font-bold" {...props} />,
+              ul: ({node, ...props}) => <ul className="my-6 list-disc list-inside" {...props} />,
+              ol: ({node, ...props}) => <ol className="my-6 list-decimal list-inside" {...props} />,
+              li: ({node, ...props}) => <li className="text-gray-700 leading-relaxed mb-2" {...props} />,
             }}
           >
             {post.content}
