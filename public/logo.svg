@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <g transform="translate(100, 100)">
+    <!-- Center circle -->
+    <circle cx="0" cy="0" r="8" fill="#1D1D1D"/>
+
+    <!-- Petals -->
+    <g id="petal">
+      <!-- Top petal -->
+      <ellipse cx="0" cy="-45" rx="15" ry="35" fill="none" stroke="#1D1D1D" stroke-width="2"/>
+      <circle cx="0" cy="-70" r="6" fill="#1D1D1D"/>
+    </g>
+
+    <!-- Rotate petals around center -->
+    <use href="#petal" transform="rotate(45)"/>
+    <use href="#petal" transform="rotate(90)"/>
+    <use href="#petal" transform="rotate(135)"/>
+    <use href="#petal" transform="rotate(180)"/>
+    <use href="#petal" transform="rotate(225)"/>
+    <use href="#petal" transform="rotate(270)"/>
+    <use href="#petal" transform="rotate(315)"/>
+  </g>
+</svg>

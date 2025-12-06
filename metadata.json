@@ -1,0 +1,5 @@
+{
+  "name": "HackerOS",
+  "description": "A PostHog-inspired brutalist web desktop OS featuring Gemini AI integration.",
+  "requestFramePermissions": []
+}
