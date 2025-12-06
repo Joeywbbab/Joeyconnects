@@ -59,13 +59,13 @@ const PostListView: React.FC<PostListViewProps> = ({
       {/* Header with category filters */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold font-sans">Writing</h2>
+          <h2 className="text-xl font-bold font-sans">Writing</h2>
           <button
             onClick={onRefresh}
             disabled={loading}
-            className="px-4 py-2 bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans flex items-center gap-2 disabled:opacity-50"
+            className="px-3 py-1.5 text-sm bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans flex items-center gap-2 disabled:opacity-50"
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Refresh
           </button>
         </div>
@@ -108,10 +108,10 @@ const PostListView: React.FC<PostListViewProps> = ({
                 className="w-full text-left p-4 bg-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all flex items-start justify-between group"
               >
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold font-sans mb-1 group-hover:text-ph-blue transition-colors">
+                  <h3 className="text-base font-bold font-sans mb-1 group-hover:text-ph-blue transition-colors">
                     {post.title}
                   </h3>
-                  <div className="flex items-center gap-3 text-sm text-gray-500 font-mono">
+                  <div className="flex items-center gap-3 text-xs text-gray-500 font-mono">
                     <span>{post.date}</span>
                     {post.tags.length > 0 && (
                       <>
@@ -125,7 +125,7 @@ const PostListView: React.FC<PostListViewProps> = ({
                     )}
                   </div>
                 </div>
-                <div className="text-ph-blue font-mono text-sm mt-1">→</div>
+                <div className="text-ph-blue font-mono text-xs mt-1">→</div>
               </button>
             ))}
           </div>
@@ -148,21 +148,21 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
   return (
     <div className="h-full flex gap-4">
       {/* Left sidebar - Post list */}
-      <div className="w-64 flex-shrink-0 border-r-2 border-ph-black pr-4 overflow-y-auto">
+      <div className="w-56 flex-shrink-0 border-r-2 border-ph-black pr-3 overflow-y-auto">
         <button
           onClick={onBack}
-          className="mb-4 px-3 py-1 text-sm bg-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans flex items-center gap-2"
+          className="mb-3 px-2 py-1 text-xs bg-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans flex items-center gap-1.5"
         >
-          <List size={14} />
+          <List size={12} />
           All Posts
         </button>
 
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {allPosts.map((p) => (
             <button
               key={p.id}
               onClick={() => onSelectPost(p)}
-              className={`w-full text-left px-3 py-2 text-sm font-mono transition-all ${
+              className={`w-full text-left px-2 py-1.5 text-xs font-mono transition-all ${
                 p.id === post.id
                   ? 'bg-ph-blue text-white border-2 border-ph-black'
                   : 'text-gray-600 hover:text-ph-black hover:bg-gray-100'
@@ -176,10 +176,10 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto pr-4">
-        <h1 className="text-4xl font-bold font-sans mb-4">{post.title}</h1>
+        <h1 className="text-3xl font-bold font-sans mb-3">{post.title}</h1>
 
-        <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-ph-black">
-          <span className="text-gray-600 font-mono text-sm">{post.date}</span>
+        <div className="flex items-center gap-3 mb-6 pb-3 border-b-2 border-ph-black">
+          <span className="text-gray-600 font-mono text-xs">{post.date}</span>
           {post.tags.length > 0 && (
             <>
               <span className="text-gray-400">•</span>
@@ -187,7 +187,7 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
                 {post.tags.map(tag => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-ph-blue text-white text-xs font-mono rounded"
+                    className="px-2 py-0.5 bg-ph-blue text-white text-xs font-mono rounded"
                   >
                     #{tag}
                   </span>
@@ -195,13 +195,13 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
               </div>
             </>
           )}
-          <span className="ml-auto px-2 py-1 bg-gray-100 text-gray-700 text-xs font-mono rounded border border-gray-300">
+          <span className="ml-auto px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-mono rounded border border-gray-300">
             {post.category}
           </span>
         </div>
 
-        <div className="prose prose-lg max-w-none">
-          <div className="font-mono text-base leading-relaxed whitespace-pre-wrap">
+        <div className="prose max-w-none">
+          <div className="font-mono text-sm leading-relaxed whitespace-pre-wrap">
             {post.content}
           </div>
         </div>
@@ -209,15 +209,15 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
 
       {/* Right sidebar - Table of contents */}
       {headings.length > 0 && (
-        <div className="w-64 flex-shrink-0 border-l-2 border-ph-black pl-4 overflow-y-auto">
-          <h3 className="text-sm font-bold font-sans mb-3 text-gray-700">On this page</h3>
-          <div className="space-y-2">
+        <div className="w-52 flex-shrink-0 border-l-2 border-ph-black pl-3 overflow-y-auto">
+          <h3 className="text-xs font-bold font-sans mb-2 text-gray-700">On this page</h3>
+          <div className="space-y-1">
             {headings.map((heading, index) => (
               <a
                 key={index}
                 href={`#${heading.id}`}
-                className="block text-sm font-mono text-gray-600 hover:text-ph-blue transition-colors"
-                style={{ paddingLeft: `${(heading.level - 1) * 12}px` }}
+                className="block text-xs font-mono text-gray-600 hover:text-ph-blue transition-colors leading-tight"
+                style={{ paddingLeft: `${(heading.level - 1) * 8}px` }}
               >
                 {heading.text}
               </a>

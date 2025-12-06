@@ -73,10 +73,10 @@ export default function App() {
       title: 'Write',
       icon: <PenTool />,
       component: <WriteApp />,
-      defaultWidth: 800,
-      defaultHeight: 600,
-      defaultX: 300,
-      defaultY: 150
+      defaultWidth: 1400,
+      defaultHeight: 850,
+      defaultX: 150,
+      defaultY: 50
     },
 
     // Right Side
