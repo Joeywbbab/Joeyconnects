@@ -247,6 +247,19 @@ export const WriteApp: React.FC = () => {
     setError(null);
 
     try {
+      // Check cache first (5 minute cache)
+      const cacheKey = `blog-posts-${GITHUB_OWNER}-${GITHUB_REPO}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const age = Date.now() - timestamp;
+        if (age < 5 * 60 * 1000) { // 5 minutes
+          setPosts(data);
+          setLoading(false);
+          return;
+        }
+      }
+
       const listUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${POSTS_PATH}`;
       const listRes = await fetch(listUrl);
 
@@ -286,6 +299,13 @@ export const WriteApp: React.FC = () => {
         return dateB - dateA;
       });
 
+      // Save to cache
+      const cacheKey = `blog-posts-${GITHUB_OWNER}-${GITHUB_REPO}`;
+      localStorage.setItem(cacheKey, JSON.stringify({
+        data: validPosts,
+        timestamp: Date.now()
+      }));
+
       setPosts(validPosts);
     } catch (err) {
       console.error('Failed to load posts:', err);
@@ -296,10 +316,13 @@ export const WriteApp: React.FC = () => {
   };
 
   if (error) {
+    const is403 = error.includes('403');
     return (
       <div className="h-full flex flex-col items-center justify-center bg-ph-beige p-6">
         <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold font-sans mb-4 text-red-500">Failed to Load</h2>
+          <h2 className="text-2xl font-bold font-sans mb-4 text-red-500">
+            {is403 ? 'GitHub API Rate Limit Exceeded' : 'Failed to Load'}
+          </h2>
           <p className="font-mono text-sm text-gray-600 mb-6">{error}</p>
           <button
             onClick={loadPosts}
@@ -308,14 +331,22 @@ export const WriteApp: React.FC = () => {
             Retry
           </button>
           <div className="mt-6 p-4 bg-yellow-50 border-2 border-yellow-300 text-left">
-            <p className="font-mono text-xs text-gray-700 mb-2">
-              Please ensure:
+            <p className="font-mono text-xs text-gray-700 mb-2 font-bold">
+              {is403 ? 'GitHub API Limits:' : 'Please ensure:'}
             </p>
-            <ul className="font-mono text-xs text-gray-600 space-y-1 list-disc list-inside">
-              <li>GitHub repo is public</li>
-              <li>Repo path is correct: {GITHUB_OWNER}/{GITHUB_REPO}/{POSTS_PATH}</li>
-              <li>Posts folder contains .md files</li>
-            </ul>
+            {is403 ? (
+              <ul className="font-mono text-xs text-gray-600 space-y-1 list-disc list-inside">
+                <li>Unauthenticated: 60 requests/hour</li>
+                <li>Wait a bit and refresh, or try again in an hour</li>
+                <li>Browser cache may help reduce API calls</li>
+              </ul>
+            ) : (
+              <ul className="font-mono text-xs text-gray-600 space-y-1 list-disc list-inside">
+                <li>GitHub repo is public</li>
+                <li>Repo path is correct: {GITHUB_OWNER}/{GITHUB_REPO}/{POSTS_PATH}</li>
+                <li>Posts folder contains .md files</li>
+              </ul>
+            )}
           </div>
         </div>
       </div>
