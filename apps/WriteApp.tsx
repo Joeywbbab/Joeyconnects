@@ -14,11 +14,12 @@ interface Post {
 
 export const WriteApp: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Don't auto-load on mount - user must click Load button
-  // This avoids hitting GitHub API rate limit
+  useEffect(() => {
+    loadPosts();
+  }, []);
 
   const loadPosts = async () => {
     setLoading(true);
@@ -26,7 +27,15 @@ export const WriteApp: React.FC = () => {
 
     try {
       const listUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${POSTS_PATH}`;
-      const listRes = await fetch(listUrl);
+
+      // Use GitHub token if available (increases rate limit from 60/hour to 5000/hour)
+      const headers: HeadersInit = {};
+      const githubToken = import.meta.env.VITE_GITHUB_TOKEN;
+      if (githubToken) {
+        headers['Authorization'] = `Bearer ${githubToken}`;
+      }
+
+      const listRes = await fetch(listUrl, { headers });
 
       if (!listRes.ok) {
         throw new Error(`GitHub API error: ${listRes.status}`);
@@ -86,22 +95,20 @@ export const WriteApp: React.FC = () => {
             className="px-4 py-2 text-sm bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans flex items-center gap-2 disabled:opacity-50"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            {posts.length === 0 && !error ? 'Load Posts' : 'Refresh'}
+            Refresh
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <p className="text-gray-500 text-center font-mono py-8">Loading from GitHub...</p>
-          ) : posts.length === 0 && !error ? (
+          ) : posts.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 font-mono mb-4">Click "Load Posts" to fetch blog posts</p>
+              <p className="text-gray-500 font-mono mb-4">No blog posts found</p>
               <p className="text-xs text-gray-400 font-mono">
                 GitHub: {GITHUB_OWNER}/{GITHUB_REPO}/{POSTS_PATH}
               </p>
             </div>
-          ) : posts.length === 0 && error ? (
-            null  // Error is shown above
           ) : (
             <div className="space-y-3">
               {posts.map((post) => (
