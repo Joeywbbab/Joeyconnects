@@ -15,10 +15,10 @@ function formatDate(dateStr: string): string {
   const diff = now.getTime() - date.getTime();
   const hours = Math.floor(diff / (1000 * 60 * 60));
 
-  if (hours < 1) return '刚刚';
-  if (hours < 24) return `${hours}小时前`;
+  if (hours < 1) return 'Just now';
+  if (hours < 24) return `${hours}h ago`;
 
-  return date.toLocaleDateString('zh-CN', {
+  return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -44,7 +44,7 @@ const MemoCard: React.FC<MemoCardProps> = ({ memo, onDelete }) => {
           onClick={() => onDelete(memo.id)}
           className="text-xs text-red-500 hover:underline font-mono"
         >
-          删除
+          Delete
         </button>
       </div>
 
@@ -139,15 +139,15 @@ export const MemoApp: React.FC = () => {
         <div className="max-w-md text-center">
           <h2 className="text-2xl font-bold mb-4 font-sans text-ph-blue">Memo App</h2>
           <p className="font-mono text-sm text-gray-600 mb-6">
-            需要配置Supabase才能使用Memo功能
+            Supabase configuration required to use Memo
           </p>
           <div className="text-left bg-white border-2 border-ph-black p-4 shadow-retro-sm">
-            <p className="font-mono text-xs mb-2 font-bold">配置步骤：</p>
+            <p className="font-mono text-xs mb-2 font-bold">Setup Steps:</p>
             <ol className="font-mono text-xs text-gray-600 space-y-2 list-decimal list-inside">
-              <li>在 https://supabase.com 创建项目</li>
-              <li>复制 .env.example 为 .env</li>
-              <li>填入 Supabase URL 和 anon key</li>
-              <li>重启开发服务器</li>
+              <li>Create project at https://supabase.com</li>
+              <li>Copy .env.example to .env</li>
+              <li>Fill in Supabase URL and anon key</li>
+              <li>Restart dev server</li>
             </ol>
           </div>
         </div>
@@ -164,7 +164,7 @@ export const MemoApp: React.FC = () => {
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="写点什么... 使用 #标签 来分类"
+          placeholder="Write something... Use #hashtags to categorize"
           className="w-full p-4 border-2 border-ph-black rounded font-mono resize-none focus:outline-none focus:ring-2 focus:ring-ph-blue"
           rows={3}
           onKeyDown={(e) => {
@@ -175,13 +175,13 @@ export const MemoApp: React.FC = () => {
         />
         <div className="flex justify-between items-center mt-2">
           <span className="text-sm text-gray-500 font-mono">
-            {input.length} 字符
+            {input.length} characters
           </span>
           <button
             onClick={handlePost}
             className="px-6 py-2 bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans"
           >
-            发布 (⌘+Enter)
+            Post (⌘+Enter)
           </button>
         </div>
       </div>
@@ -189,9 +189,9 @@ export const MemoApp: React.FC = () => {
       {/* 列表 */}
       <div className="flex-1 overflow-y-auto space-y-4">
         {loading ? (
-          <p className="text-gray-500 text-center font-mono">加载中...</p>
+          <p className="text-gray-500 text-center font-mono">Loading...</p>
         ) : memos.length === 0 ? (
-          <p className="text-gray-500 text-center font-mono">还没有随笔，写点什么吧！</p>
+          <p className="text-gray-500 text-center font-mono">No memos yet. Write something!</p>
         ) : (
           memos.map((memo) => (
             <MemoCard key={memo.id} memo={memo} onDelete={handleDelete} />
