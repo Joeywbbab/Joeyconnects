@@ -3,6 +3,7 @@ import { List, RefreshCw } from 'lucide-react';
 import { Post, parseFrontmatter } from '../utils/markdown';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 const GITHUB_OWNER = 'Joeywbbab';
 const GITHUB_REPO = 'Joeyconnects';
@@ -203,7 +204,7 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
 
         <div className="prose prose-base max-w-none prose-headings:font-sans prose-headings:font-bold prose-h1:text-3xl prose-h1:mt-8 prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:my-6 prose-li:text-gray-700 prose-li:leading-relaxed">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
+            remarkPlugins={[remarkGfm, remarkBreaks]}
             components={{
               h1: ({node, ...props}) => <h1 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
               h2: ({node, ...props}) => <h2 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,

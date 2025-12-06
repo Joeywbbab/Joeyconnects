@@ -14,7 +14,7 @@ export const MenuBar: React.FC = () => {
     <div className="h-8 bg-white border-b-2 border-ph-black flex items-center justify-between px-3 fixed top-0 w-full z-50 select-none shadow-sm">
       <div className="flex items-center gap-4">
         <button className="flex items-center gap-2 font-bold font-sans text-sm hover:bg-ph-orange px-2 py-0.5 border-2 border-transparent hover:border-ph-black transition-colors">
-          <img src="/logo.svg" alt="Logo" className="w-5 h-5" />
+          <img src="/logo-new.png" alt="Logo" className="w-5 h-5" />
           <span className="hidden md:inline">Joeyconnects.os</span>
         </button>
 
