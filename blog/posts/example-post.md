@@ -2,6 +2,7 @@
 title: "Welcome to My Blog"
 date: 2025-01-15
 tags: [welcome, thoughts, beginning]
+category: blog
 excerpt: "The first post on my personal blog, exploring curiosities and sharing insights across product, design, and life."
 ---
 

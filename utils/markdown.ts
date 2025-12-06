@@ -6,6 +6,7 @@ export interface Post {
   excerpt: string;
   content: string;
   filename: string;
+  category: 'blog' | 'newsletter' | 'tutorials';
 }
 
 export function parseFrontmatter(markdown: string, filename: string): Post {
@@ -20,7 +21,8 @@ export function parseFrontmatter(markdown: string, filename: string): Post {
       tags: [],
       excerpt: '',
       content: markdown,
-      filename
+      filename,
+      category: 'blog'
     };
   }
 
@@ -48,6 +50,7 @@ export function parseFrontmatter(markdown: string, filename: string): Post {
     tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
     excerpt: frontmatter.excerpt || content.trim().slice(0, 150) + '...',
     content: content.trim(),
-    filename
+    filename,
+    category: (frontmatter.category as 'blog' | 'newsletter' | 'tutorials') || 'blog'
   };
 }

@@ -10,6 +10,13 @@ This folder contains blog posts that will be displayed on the Write app.
 4. Commit and push to GitHub
 5. The website will automatically fetch and display your posts
 
+## Post Categories
+
+Posts can be categorized as:
+- **blog**: Regular blog posts
+- **newsletter**: Newsletter-style content
+- **tutorials**: Step-by-step tutorials
+
 ## Post Format
 
 Each post should be a Markdown file with frontmatter:
@@ -19,6 +26,7 @@ Each post should be a Markdown file with frontmatter:
 title: "Your Post Title"
 date: 2025-01-15
 tags: [tag1, tag2, tag3]
+category: blog
 excerpt: "A brief description of your post..."
 ---
 
