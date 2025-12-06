@@ -12,7 +12,7 @@ const escapeHtml = (text: string): string => {
 };
 
 export const TerminalApp: React.FC = () => {
-  const [history, setHistory] = useState<string[]>(['Welcome to HACKER_OS v2.0', 'Type "help" for available commands.']);
+  const [history, setHistory] = useState<string[]>(['Welcome to Joeyconnects.os', 'Type "help" for available commands.']);
   const [currentLine, setCurrentLine] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 

@@ -255,6 +255,7 @@ export const WriteApp: React.FC = () => {
         headers['Authorization'] = `token ${githubToken}`;
       }
 
+      console.log('[WriteApp] Fetching posts from:', listUrl);
       const listRes = await fetch(listUrl, { headers });
 
       if (!listRes.ok) {
@@ -262,30 +263,38 @@ export const WriteApp: React.FC = () => {
       }
 
       const files = await listRes.json();
+      console.log('[WriteApp] Found files:', files);
 
       if (!Array.isArray(files)) {
         throw new Error('Failed to read file list');
       }
 
-      const postPromises = files
-        .filter(f => f.name && f.name.endsWith('.md'))
-        .map(async (file) => {
-          try {
-            const contentRes = await fetch(file.download_url, { headers });
-            if (!contentRes.ok) {
-              console.error(`Failed to read file ${file.name}`);
-              return null;
-            }
-            const content = await contentRes.text();
-            return parseFrontmatter(content, file.name);
-          } catch (err) {
-            console.error(`Failed to parse file ${file.name}:`, err);
+      const mdFiles = files.filter(f => f.name && f.name.endsWith('.md'));
+      console.log('[WriteApp] Markdown files:', mdFiles.map(f => f.name));
+
+      const postPromises = mdFiles.map(async (file) => {
+        try {
+          console.log('[WriteApp] Fetching content for:', file.name);
+          // Don't use auth headers for raw.githubusercontent.com to avoid CORS preflight issues
+          const contentRes = await fetch(file.download_url);
+          if (!contentRes.ok) {
+            console.error(`Failed to read file ${file.name}`);
             return null;
           }
-        });
+          const content = await contentRes.text();
+          console.log('[WriteApp] Parsing:', file.name);
+          const post = parseFrontmatter(content, file.name);
+          console.log('[WriteApp] Parsed post:', post);
+          return post;
+        } catch (err) {
+          console.error(`Failed to parse file ${file.name}:`, err);
+          return null;
+        }
+      });
 
       const postsData = await Promise.all(postPromises);
       const validPosts = postsData.filter((p): p is Post => p !== null);
+      console.log('[WriteApp] Valid posts:', validPosts);
 
       validPosts.sort((a, b) => {
         const dateA = new Date(a.date || 0).getTime();
