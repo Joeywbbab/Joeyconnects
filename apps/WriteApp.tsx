@@ -201,8 +201,18 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
           </span>
         </div>
 
-        <div className="prose prose-sm max-w-none prose-headings:font-sans prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-3 prose-p:text-gray-700 prose-p:leading-7 prose-p:mb-4 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:my-4 prose-li:text-gray-700">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        <div className="prose prose-base max-w-none prose-headings:font-sans prose-headings:font-bold prose-h1:text-3xl prose-h1:mt-8 prose-h1:mb-6 prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:my-6 prose-li:text-gray-700 prose-li:leading-relaxed">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              h1: ({node, ...props}) => <h1 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
+              h2: ({node, ...props}) => <h2 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
+              h3: ({node, ...props}) => <h3 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
+              h4: ({node, ...props}) => <h4 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
+              h5: ({node, ...props}) => <h5 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
+              h6: ({node, ...props}) => <h6 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} {...props} />,
+            }}
+          >
             {post.content}
           </ReactMarkdown>
         </div>
@@ -217,7 +227,14 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
               <a
                 key={index}
                 href={`#${heading.id}`}
-                className="block text-xs font-mono text-gray-600 hover:text-ph-blue transition-colors leading-tight"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById(heading.id);
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+                className="block text-xs font-mono text-gray-600 hover:text-ph-blue transition-colors leading-tight cursor-pointer"
                 style={{ paddingLeft: `${(heading.level - 1) * 8}px` }}
               >
                 {heading.text}
