@@ -3,9 +3,9 @@ import { List, RefreshCw } from 'lucide-react';
 import { Post, parseFrontmatter } from '../utils/markdown';
 
 // GitHub配置 - 用户需要修改这些值
-const GITHUB_OWNER = 'joeyconnects';
-const GITHUB_REPO = 'blog';
-const POSTS_PATH = 'posts';
+const GITHUB_OWNER = 'Joeywbbab';
+const GITHUB_REPO = 'Joeyconnects';
+const POSTS_PATH = 'blog/posts';
 
 type Category = 'blog' | 'newsletter' | 'tutorials';
 
