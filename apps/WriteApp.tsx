@@ -33,6 +33,7 @@ interface PostListViewProps {
   onCategoryChange: (category: Category | 'all') => void;
   onSelect: (post: Post) => void;
   onRefresh: () => void;
+  onClearCache: () => void;
   loading: boolean;
 }
 
@@ -42,6 +43,7 @@ const PostListView: React.FC<PostListViewProps> = ({
   onCategoryChange,
   onSelect,
   onRefresh,
+  onClearCache,
   loading
 }) => {
   const filteredPosts = useMemo(() => {
@@ -62,14 +64,23 @@ const PostListView: React.FC<PostListViewProps> = ({
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold font-sans">Writing</h2>
-          <button
-            onClick={onRefresh}
-            disabled={loading}
-            className="px-3 py-1.5 text-sm bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans flex items-center gap-2 disabled:opacity-50"
-          >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            Refresh
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={onClearCache}
+              disabled={loading}
+              className="px-3 py-1.5 text-sm bg-white text-ph-black border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans disabled:opacity-50"
+            >
+              Clear Cache
+            </button>
+            <button
+              onClick={onRefresh}
+              disabled={loading}
+              className="px-3 py-1.5 text-sm bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans flex items-center gap-2 disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* Category tabs */}
@@ -242,18 +253,24 @@ export const WriteApp: React.FC = () => {
     loadPosts();
   }, []);
 
+  const clearCache = () => {
+    const cacheKey = `blog-posts-${GITHUB_OWNER}-${GITHUB_REPO}`;
+    localStorage.removeItem(cacheKey);
+    loadPosts();
+  };
+
   const loadPosts = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Check cache first (5 minute cache)
+      // Check cache first (30 minute cache)
       const cacheKey = `blog-posts-${GITHUB_OWNER}-${GITHUB_REPO}`;
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         const { data, timestamp } = JSON.parse(cached);
         const age = Date.now() - timestamp;
-        if (age < 5 * 60 * 1000) { // 5 minutes
+        if (age < 30 * 60 * 1000) { // 30 minutes
           setPosts(data);
           setLoading(false);
           return;
@@ -375,6 +392,7 @@ export const WriteApp: React.FC = () => {
           onCategoryChange={setSelectedCategory}
           onSelect={setSelectedPost}
           onRefresh={loadPosts}
+          onClearCache={clearCache}
           loading={loading}
         />
       )}
