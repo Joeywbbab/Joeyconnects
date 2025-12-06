@@ -31,8 +31,8 @@ export const WriteApp: React.FC = () => {
       // Use GitHub token if available (increases rate limit from 60/hour to 5000/hour)
       const headers: HeadersInit = {};
       const githubToken = import.meta.env.VITE_GITHUB_TOKEN;
-      if (githubToken) {
-        headers['Authorization'] = `Bearer ${githubToken}`;
+      if (githubToken && githubToken !== 'your_token_here') {
+        headers['Authorization'] = `token ${githubToken}`;
       }
 
       const listRes = await fetch(listUrl, { headers });
