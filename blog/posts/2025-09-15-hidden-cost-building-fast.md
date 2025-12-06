@@ -1,9 +1,9 @@
 ---
-title: "The Hidden Cost of Building Fast: Lessons from 4 Failed Versions of My Note App"
+title: The Hidden Cost of Building Fast - Lessons from 4 Failed Versions of My Note App
 date: 2025-09-15
 tags: [thoughts, product, vibecoding]
 category: blog
-excerpt: "Why shipping fast isn't always shipping smart — reflections on building, scrapping, and rebuilding a note app four times."
+excerpt: Why shipping fast isn't always shipping smart — reflections on building, scrapping, and rebuilding a note app four times.
 ---
 
 For the past half-year, my feed has been haunted by posts on Twitter, Reddit, and Hacker News with titles like:

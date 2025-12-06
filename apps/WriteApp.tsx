@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { List, RefreshCw } from 'lucide-react';
 import { Post, parseFrontmatter } from '../utils/markdown';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // GitHub配置 - 用户需要修改这些值
 const GITHUB_OWNER = 'Joeywbbab';
@@ -200,10 +202,10 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
           </span>
         </div>
 
-        <div className="prose max-w-none">
-          <div className="font-mono text-sm leading-relaxed whitespace-pre-wrap">
+        <div className="prose prose-sm max-w-none prose-headings:font-sans prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-3 prose-p:text-gray-700 prose-p:leading-7 prose-p:mb-4 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:my-4 prose-li:text-gray-700">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {post.content}
-          </div>
+          </ReactMarkdown>
         </div>
       </div>
 
