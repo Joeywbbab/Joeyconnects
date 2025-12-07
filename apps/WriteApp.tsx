@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { List, RefreshCw } from 'lucide-react';
+import { List } from 'lucide-react';
 import { Post, parseFrontmatter } from '../utils/markdown';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -30,8 +30,9 @@ interface PostListViewProps {
   posts: Post[];
   selectedCategory: Category | 'all';
   onCategoryChange: (category: Category | 'all') => void;
+  selectedTag: string | null;
+  onTagChange: (tag: string | null) => void;
   onSelect: (post: Post) => void;
-  onRefresh: () => void;
   loading: boolean;
 }
 
@@ -39,14 +40,35 @@ const PostListView: React.FC<PostListViewProps> = ({
   posts,
   selectedCategory,
   onCategoryChange,
+  selectedTag,
+  onTagChange,
   onSelect,
-  onRefresh,
   loading
 }) => {
+  // Get all unique tags from posts
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    posts.forEach(post => {
+      post.tags.forEach(tag => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, [posts]);
+
   const filteredPosts = useMemo(() => {
-    if (selectedCategory === 'all') return posts;
-    return posts.filter(p => p.category === selectedCategory);
-  }, [posts, selectedCategory]);
+    let filtered = posts;
+    
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+    
+    // Filter by tag
+    if (selectedTag) {
+      filtered = filtered.filter(p => p.tags.includes(selectedTag));
+    }
+    
+    return filtered;
+  }, [posts, selectedCategory, selectedTag]);
 
   const categories: Array<{ key: Category | 'all'; label: string }> = [
     { key: 'all', label: 'All' },
@@ -55,80 +77,150 @@ const PostListView: React.FC<PostListViewProps> = ({
     { key: 'tutorials', label: 'Tutorials' }
   ];
 
+  // Format date for display
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold font-sans">Writing</h2>
-          <button
-            onClick={onRefresh}
-            disabled={loading}
-            className="px-3 py-1.5 text-sm bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans flex items-center gap-2 disabled:opacity-50"
-          >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            Refresh
-          </button>
-        </div>
-
-        {/* Category tabs */}
-        <div className="flex gap-2 border-b-2 border-ph-black pb-2">
-          {categories.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => onCategoryChange(key)}
-              className={`px-4 py-2 font-mono text-sm transition-all ${
-                selectedCategory === key
-                  ? 'bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm'
-                  : 'text-gray-600 hover:text-ph-black'
-              }`}
+      {/* Filter bar */}
+      <div className="border-b-2 border-ph-black bg-ph-beige px-4 py-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-sm font-mono text-gray-700">where</span>
+          
+          {/* Category filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-mono text-gray-700">category</span>
+            <span className="text-sm font-mono text-gray-700">eq</span>
+            <select
+              value={selectedCategory}
+              onChange={(e) => onCategoryChange(e.target.value as Category | 'all')}
+              className="px-3 py-1 text-sm font-mono bg-white border-2 border-ph-black focus:outline-none focus:ring-2 focus:ring-ph-blue cursor-pointer"
             >
-              {label}
-            </button>
-          ))}
+              {categories.map(({ key, label }) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Tag filter */}
+          {allTags.length > 0 && (
+            <>
+              <span className="text-sm font-mono text-gray-700">and</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-mono text-gray-700">tags</span>
+                <span className="text-sm font-mono text-gray-700">includes</span>
+                <select
+                  value={selectedTag || 'all'}
+                  onChange={(e) => onTagChange(e.target.value === 'all' ? null : e.target.value)}
+                  className="px-3 py-1 text-sm font-mono bg-white border-2 border-ph-black focus:outline-none focus:ring-2 focus:ring-ph-blue cursor-pointer"
+                >
+                  <option value="all">All</option>
+                  {allTags.map(tag => (
+                    <option key={tag} value={tag}>
+                      {tag}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Posts table */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Content area */}
+      <div className="flex-1 overflow-y-auto px-6 py-4">
+        {/* Title */}
+        <h1 className="text-3xl font-bold font-sans mb-6">posts.psheet</h1>
+
+        {/* Table */}
         {loading ? (
-          <p className="text-gray-500 text-center font-mono py-8">Loading...</p>
+          <div className="text-center py-12">
+            <p className="text-gray-500 font-mono">Loading posts...</p>
+          </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500 font-mono mb-4">No posts found</p>
-            <p className="text-sm text-gray-400 font-mono">
-              GitHub repo: {GITHUB_OWNER}/{GITHUB_REPO}/{POSTS_PATH}
-            </p>
+          <div className="text-center py-12">
+            <p className="text-gray-500 font-mono mb-2">No posts found</p>
+            {(selectedCategory !== 'all' || selectedTag) && (
+              <p className="text-sm text-gray-400 font-mono">
+                Try adjusting your filters
+              </p>
+            )}
           </div>
         ) : (
-          <div className="space-y-2">
-            {filteredPosts.map((post) => (
-              <button
-                key={post.id}
-                onClick={() => onSelect(post)}
-                className="w-full text-left p-4 bg-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all flex items-start justify-between group"
-              >
-                <div className="flex-1">
-                  <h3 className="text-base font-bold font-sans mb-1 group-hover:text-ph-blue transition-colors">
-                    {post.title}
-                  </h3>
-                  <div className="flex items-center gap-3 text-xs text-gray-500 font-mono">
-                    <span>{post.date}</span>
-                    {post.tags.length > 0 && (
-                      <>
-                        <span>•</span>
-                        <div className="flex gap-2">
-                          {post.tags.map(tag => (
-                            <span key={tag} className="text-ph-blue">#{tag}</span>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className="text-ph-blue font-mono text-xs mt-1">→</div>
-              </button>
-            ))}
+          <div className="border-2 border-ph-black bg-white">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-100 border-b-2 border-ph-black">
+                  <th className="text-left px-4 py-3 text-sm font-bold font-sans border-r-2 border-ph-black">Date</th>
+                  <th className="text-left px-4 py-3 text-sm font-bold font-sans border-r-2 border-ph-black">Title</th>
+                  <th className="text-left px-4 py-3 text-sm font-bold font-sans">Tags</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPosts.map((post, index) => (
+                  <tr
+                    key={post.id}
+                    onClick={() => onSelect(post)}
+                    className={`border-b border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors ${
+                      index === filteredPosts.length - 1 ? '' : ''
+                    }`}
+                  >
+                    <td className="px-4 py-3 text-sm font-mono text-gray-600 border-r-2 border-ph-black">
+                      {formatDate(post.date)}
+                    </td>
+                    <td className="px-4 py-3 border-r-2 border-ph-black">
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelect(post);
+                        }}
+                        className="text-left font-sans font-medium text-gray-900 hover:text-ph-blue underline decoration-1 underline-offset-2 transition-colors cursor-pointer"
+                      >
+                        {post.title}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-x-2 gap-y-1">
+                        {post.tags.length > 0 ? (
+                          post.tags.map((tag, tagIndex) => (
+                            <span key={tag} className="inline-flex items-center">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onTagChange(tag);
+                                }}
+                                className={`text-xs font-mono underline decoration-1 underline-offset-2 transition-colors ${
+                                  selectedTag === tag
+                                    ? 'text-ph-blue font-semibold'
+                                    : 'text-gray-600 hover:text-ph-blue'
+                                }`}
+                              >
+                                {tag}
+                              </button>
+                              {tagIndex < post.tags.length - 1 && (
+                                <span className="text-xs text-gray-400 mx-1">,</span>
+                              )}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs font-mono text-gray-400">—</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
@@ -256,6 +348,7 @@ export const WriteApp: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -366,8 +459,9 @@ export const WriteApp: React.FC = () => {
           posts={posts}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
+          selectedTag={selectedTag}
+          onTagChange={setSelectedTag}
           onSelect={setSelectedPost}
-          onRefresh={loadPosts}
           loading={loading}
         />
       )}

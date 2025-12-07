@@ -15,3 +15,22 @@ export interface Memo {
   created_at: string;
   updated_at: string;
 }
+
+export type VideoCategory = 'ytb tutorials' | 'cartoon' | 'life';
+
+export interface Video {
+  id: string;
+  youtube_id: string;
+  title?: string | null;
+  description?: string | null;
+  category: VideoCategory;
+  thumbnail_url?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface YouTubeVideoInfo {
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+}

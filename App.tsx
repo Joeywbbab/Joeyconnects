@@ -9,6 +9,7 @@ import { TerminalApp } from './apps/TerminalApp';
 import { ProductOSApp } from './apps/ProductOSApp';
 import { MemoApp } from './apps/MemoApp';
 import { WriteApp } from './apps/WriteApp';
+import { VideosApp } from './apps/VideosApp';
 import { AnimatePresence } from 'framer-motion';
 
 const MAX_Z_INDEX = 9999;
@@ -94,24 +95,11 @@ export default function App() {
       id: AppId.VIDEOS,
       title: 'Videos',
       icon: <Video />,
-      component: (
-        <div className="h-full bg-ph-black text-ph-beige p-4 overflow-y-auto">
-          <div className="grid grid-cols-1 gap-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="aspect-video bg-gray-800 border-2 border-gray-700 flex items-center justify-center relative group cursor-pointer">
-                <div className="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center group-hover:bg-ph-orange group-hover:border-ph-orange group-hover:text-black transition-colors">
-                  <Video size={32} />
-                </div>
-                <span className="absolute bottom-2 left-2 text-xs font-mono">demo_clip_0{i}.mp4</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ),
-      defaultWidth: 600,
-      defaultHeight: 450,
+      component: <VideosApp />,
+      defaultWidth: 1200,
+      defaultHeight: 800,
       defaultX: 400,
-      defaultY: 200
+      defaultY: 100
     },
     {
       id: AppId.COMICS,
