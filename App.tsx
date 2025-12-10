@@ -10,6 +10,7 @@ import { ProductOSApp } from './apps/ProductOSApp';
 import { MemoApp } from './apps/MemoApp';
 import { WriteApp } from './apps/WriteApp';
 import { VideosApp } from './apps/VideosApp';
+import { ComicsApp } from './apps/ComicsApp';
 import { AnimatePresence } from 'framer-motion';
 
 const MAX_Z_INDEX = 9999;
@@ -44,10 +45,10 @@ export default function App() {
       title: 'About',
       icon: <Layout />,
       component: <WelcomeApp />,
-      defaultWidth: 800,
-      defaultHeight: 600,
-      defaultX: 100,
-      defaultY: 80
+      defaultWidth: 1400,
+      defaultHeight: 850,
+      defaultX: 150,
+      defaultY: 50
     },
     {
       id: AppId.PRODUCT_OS,
@@ -86,10 +87,10 @@ export default function App() {
       title: 'Memo',
       icon: <StickyNote />,
       component: <MemoApp />,
-      defaultWidth: 600,
-      defaultHeight: 600,
-      defaultX: 800,
-      defaultY: 100
+      defaultWidth: 1400,
+      defaultHeight: 850,
+      defaultX: 150,
+      defaultY: 50
     },
     {
       id: AppId.VIDEOS,
@@ -105,24 +106,11 @@ export default function App() {
       id: AppId.COMICS,
       title: 'Comics',
       icon: <BookOpen />,
-      component: (
-        <div className="h-full bg-white p-4 overflow-y-auto flex flex-col items-center">
-          <div className="w-full max-w-sm border-4 border-ph-black p-2 shadow-retro mb-4">
-            <div className="aspect-square bg-gray-100 flex items-center justify-center text-center p-4 font-bold font-sans">
-              "Why did the developer go broke? Because he used up all his cache."
-            </div>
-          </div>
-          <div className="w-full max-w-sm border-4 border-ph-black p-2 shadow-retro">
-            <div className="aspect-square bg-ph-blue text-white flex items-center justify-center text-center p-4 font-bold font-sans">
-              *Debugging Face*
-            </div>
-          </div>
-        </div>
-      ),
-      defaultWidth: 400,
-      defaultHeight: 600,
-      defaultX: 500,
-      defaultY: 100
+      component: <ComicsApp />,
+      defaultWidth: 1400,
+      defaultHeight: 850,
+      defaultX: 150,
+      defaultY: 50
     },
     {
       id: AppId.TRAVEL,
@@ -175,10 +163,10 @@ export default function App() {
           </div>
         </div>
       ),
-      defaultWidth: 500,
-      defaultHeight: 500,
-      defaultX: 600,
-      defaultY: 150
+      defaultWidth: 1400,
+      defaultHeight: 850,
+      defaultX: 150,
+      defaultY: 50
     }
   ], []);
 
@@ -251,6 +239,13 @@ export default function App() {
     setActiveWindowId(id);
   };
 
+  const resizeWindow = (id: string, size: { width: number; height: number }) => {
+    setWindows((prev: Record<string, WindowState>) => ({
+      ...prev,
+      [id]: { ...prev[id], size }
+    }));
+  };
+
   return (
     <div className="h-screen w-screen overflow-hidden relative font-sans selection:bg-ph-orange selection:text-ph-black bg-ph-beige">
       <MenuBar />
@@ -272,6 +267,7 @@ export default function App() {
                 onMaximize={() => maximizeWindow(winState.id)}
                 onFocus={() => focusWindow(winState.id)}
                 onDragEnd={() => focusWindow(winState.id)}
+                onResize={(size) => resizeWindow(winState.id, size)}
               />
             );
           })}

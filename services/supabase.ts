@@ -12,6 +12,9 @@ export interface Memo {
   id: string;
   content: string;
   hashtags: string[];
+  image_url?: string | null;
+  image_name?: string | null;
+  image_path?: string | null;
   created_at: string;
   updated_at: string;
 }
