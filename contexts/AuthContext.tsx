@@ -6,7 +6,8 @@ interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signInWithPassword: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -26,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // 你的 admin 邮箱列表（可以添加多个）
   const ADMIN_EMAILS = [
-    'your-email@example.com', // 替换为你的实际邮箱
+    'joeybab5207@gmail.com', // 替换为你的实际邮箱
   ];
 
   const isAdmin = user ? ADMIN_EMAILS.includes(user.email || '') : false;
@@ -53,11 +54,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signInWithPassword = async (email: string, password: string) => {
     if (!supabase) throw new Error('Supabase not initialized');
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
+    });
+    if (error) throw error;
+  };
+
+  const signInWithGoogle = async () => {
+    if (!supabase) throw new Error('Supabase not initialized');
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
     });
     if (error) throw error;
   };
@@ -69,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, signInWithPassword, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );
