@@ -59,6 +59,18 @@ export const StoreApp: React.FC = () => {
     idea_id: ''
   });
 
+  // Helper function to prefill FlowTree data
+  const prefillFlowTree = () => {
+    setNewProduct({
+      title: 'FlowTree 🌳',
+      description: 'A powerful prototype interaction flow management tool. Features: Interactive flow management with screenshots, Jump hotspots for navigation, Comment markers for annotations, Linear/Parallel layouts, IndexedDB storage for large data, Import/Export in JSON, High-quality preview. Built with pure HTML/CSS/JavaScript, no server required.',
+      actual_days: 14,
+      product_url: 'https://github.com/yourusername/flowtree',
+      idea_id: ''
+    });
+    setShowProductForm(true);
+  };
+
   useEffect(() => {
     fetchIdeas();
     fetchProducts();
@@ -347,7 +359,16 @@ export const StoreApp: React.FC = () => {
         {/* Product Form */}
         {showProductForm && user && (
           <div className="mb-6 bg-white border-2 border-ph-black p-6 shadow-retro">
-            <h3 className="font-bold text-lg mb-4">Upload a Product</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg">Upload a Product</h3>
+              <button
+                type="button"
+                onClick={prefillFlowTree}
+                className="px-3 py-1 text-xs bg-ph-blue text-white border-2 border-ph-black font-mono"
+              >
+                Demo: Fill FlowTree
+              </button>
+            </div>
             <form onSubmit={handleCreateProduct} className="space-y-4">
               <div>
                 <label className="block text-sm font-bold mb-2">Title</label>
