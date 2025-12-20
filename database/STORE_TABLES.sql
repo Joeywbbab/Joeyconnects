@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS products (
   creator_email TEXT,
   actual_days INTEGER,
   product_url TEXT,
+  app_path TEXT,
   image_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

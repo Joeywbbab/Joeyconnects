@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowTree</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#09090b;--bg2:#111113;--bg3:#18181b;--bg4:#27272a;--text:#fafafa;--text2:#a1a1aa;--text3:#71717a;--accent:#3b82f6;--accent2:#60a5fa;--border:#27272a;--danger:#ef4444;--success:#22c55e;--orange:#f97316;--purple:#a855f7}
+        body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+        .page{display:none}.page.active{display:block}
+        
+        .header{padding:14px 32px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg2)}
+        .logo{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+        
+        .btn{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+        .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
+        .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{background:var(--bg4)}
+        .btn-danger{background:rgba(239,68,68,.15);color:var(--danger);border:none}.btn-danger:hover{background:rgba(239,68,68,.25)}
+        .btn-icon{width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);cursor:pointer}
+        .btn-icon:hover{background:var(--bg4);color:var(--text)}
+        .btn-sm{padding:4px 8px;font-size:10px}
+        
+        .home-content{max-width:1200px;margin:0 auto;padding:40px 32px}
+        .home-title{font-size:26px;font-weight:700;margin-bottom:8px}
+        .home-desc{color:var(--text3);margin-bottom:32px;font-size:14px}
+        .flow-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+        .flow-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;position:relative;transition:all .2s}
+        .flow-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+        .flow-card-preview{height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;gap:6px;padding:14px}
+        .flow-card-thumb{width:50px;height:50px;background:var(--bg4);border-radius:5px;overflow:hidden}
+        .flow-card-thumb img{width:100%;height:100%;object-fit:cover}
+        .flow-card-body{padding:14px}
+        .flow-card-title{font-weight:600;margin-bottom:3px;font-size:14px}
+        .flow-card-meta{font-size:11px;color:var(--text3)}
+        .flow-card-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity .15s}
+        .flow-card:hover .flow-card-actions{opacity:1}
+        .new-flow-card{border:2px dashed var(--border);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:10px;color:var(--text3)}
+        .new-flow-card:hover{border-color:var(--accent);color:var(--accent)}
+        
+        .editor{display:none;height:100vh;grid-template-columns:260px 1fr 280px}
+        .editor.active{display:grid}
+        
+        .sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+        .sidebar-header{padding:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+        .sidebar-title{flex:1;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .tree{flex:1;overflow-y:auto;padding:10px}
+        
+        /* Tree Structure */
+        .tree-section{margin-bottom:6px}
+        .tree-header{padding:6px 8px;border-radius:5px;cursor:pointer;font-size:11px;display:flex;align-items:center;gap:6px;transition:background .1s}
+        .tree-header:hover{background:var(--bg3)}
+        .tree-header.active{background:var(--bg4)}
+        .tree-header .arrow{font-size:8px;color:var(--text3);transition:transform .15s}
+        .tree-header .arrow.open{transform:rotate(90deg)}
+        .tree-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .tree-count{font-size:9px;color:var(--text3);background:var(--bg3);padding:1px 5px;border-radius:3px}
+        .tree-btn{width:16px;height:16px;background:none;border:none;border-radius:3px;color:var(--text3);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:9px}
+        .tree-header:hover .tree-btn{display:flex}
+        .tree-btn:hover{background:var(--bg4);color:var(--text)}
+        .tree-btn.del:hover{color:var(--danger)}
+        
+        .tree-section>.tree-header{color:var(--accent);font-weight:600}
+        .tree-group{margin-left:12px;border-left:1px solid var(--border);padding-left:8px}
+        .tree-group>.tree-header{color:var(--purple)}
+        .tree-steps{margin-left:12px;border-left:1px solid var(--border);padding-left:8px}
+        .tree-step{padding:5px 8px;border-radius:4px;cursor:pointer;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .tree-step:hover{background:var(--bg3)}
+        .tree-step.active{background:var(--bg4);color:var(--text)}
+        
+        .tree-add{padding:4px 8px;font-size:10px;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:4px}
+        .tree-add:hover{color:var(--accent)}
+        
+        .sidebar-footer{padding:10px;border-top:1px solid var(--border)}
+        .add-btn{width:100%;padding:8px;background:transparent;border:1px dashed var(--border);border-radius:6px;color:var(--text3);font-size:12px;cursor:pointer}
+        .add-btn:hover{border-color:var(--accent);color:var(--accent)}
+        
+        .canvas{background:var(--bg);padding:24px 28px;overflow:auto;display:flex;flex-direction:column}
+        .canvas-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+        .canvas-title{font-size:18px;font-weight:600}
+        .canvas-breadcrumb{font-size:11px;color:var(--text3);margin-top:3px}
+        .canvas-actions{display:flex;gap:8px}
+        
+        .steps-wrap{flex:1;overflow-x:auto;overflow-y:hidden}
+        .steps{display:flex;gap:14px;padding:10px 0;min-height:100%}
+        .steps.parallel{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+        .step{flex-shrink:0;width:160px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s}
+        .step:hover{border-color:var(--text3)}
+        .step.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.2)}
+        .step-image{aspect-ratio:1/1;background:var(--bg3);position:relative;overflow:hidden}
+        .step-image img{width:100%;height:100%;object-fit:cover}
+        .step-image-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:10px}
+        .step-hotspot-count{position:absolute;top:5px;right:5px;background:var(--orange);color:#fff;font-size:8px;padding:2px 5px;border-radius:8px;font-weight:600}
+        .step-info{padding:8px}
+        .step-name{font-size:10px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .step-action{font-size:9px;color:var(--text3)}
+        .step-connector{color:var(--text3);display:flex;align-items:center;padding:0 4px;font-size:12px}
+        .step-connector.parallel{width:100%;justify-content:center;padding:8px 0;grid-column:1/-1}
+        .empty{text-align:center;padding:60px 20px;color:var(--text3)}
+        
+        .panel{background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto}
+        .panel-header{padding:12px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text3);letter-spacing:.5px}
+        .panel-content{padding:14px}
+        .panel-section{margin-bottom:20px}
+        .panel-section-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+        .form-group{margin-bottom:12px}
+        .form-label{display:block;font-size:11px;color:var(--text3);margin-bottom:5px}
+        .form-input{width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit}
+        .form-input:focus{outline:none;border-color:var(--accent)}
+        .form-textarea{min-height:60px;resize:vertical}
+        
+        .upload{border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+        .upload:hover{border-color:var(--accent)}
+        .upload.has-img{padding:0;border:none}
+        .upload-img-wrap{position:relative}
+        .upload img{width:100%;border-radius:6px}
+        .upload-hint{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;border-radius:6px;font-size:11px}
+        .upload:hover .upload-hint{opacity:1}
+        
+        .hotspot-item{display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg3);border-radius:6px;margin-bottom:6px;font-size:11px;border:1px solid transparent;cursor:pointer}
+        .hotspot-item:hover{border-color:var(--border)}
+        .hotspot-item.active{border-color:var(--orange)}
+        .hotspot-color{width:10px;height:10px;background:var(--orange);border-radius:2px}
+        .hotspot-color.annotation{background:var(--accent)}
+        .hotspot-info{flex:1;min-width:0}
+        .hotspot-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .hotspot-target{font-size:10px;color:var(--text3)}
+        .hotspot-del{color:var(--text3);cursor:pointer;padding:2px}
+        .hotspot-del:hover{color:var(--danger)}
+        
+        .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:1000}
+        .modal-bg.show{display:flex}
+        .modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:90%;max-width:400px}
+        .modal-head{padding:16px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px}
+        .modal-body{padding:18px}
+        .modal-foot{padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+        
+        .preview-bg .modal{max-width:100%;width:100%;height:100%;border-radius:0;display:flex;flex-direction:column}
+        .preview-body{flex:1;display:flex;align-items:center;justify-content:center;background:#000;position:relative;padding:20px;overflow:hidden}
+        .preview-screen{position:relative;max-height:80vh;max-width:90vw}
+        .preview-screen img{max-height:80vh;max-width:90vw;border-radius:8px;display:block}
+        .preview-hotspot{position:absolute;border:2px solid var(--orange);background:rgba(249,115,22,.2);cursor:pointer;border-radius:3px;transition:all .15s}
+        .preview-hotspot:hover{background:rgba(249,115,22,.4)}
+        .preview-hotspot.annotation{border-color:var(--accent);background:rgba(59,130,246,.2);cursor:default}
+        .preview-hotspot.annotation:hover{background:rgba(59,130,246,.3)}
+        .preview-hotspot-label{position:absolute;bottom:100%;left:0;background:var(--bg2);color:var(--text);font-size:10px;padding:2px 6px;border-radius:3px;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none}
+        .preview-hotspot:hover .preview-hotspot-label{opacity:1}
+        .preview-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;background:var(--bg4);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
+        .preview-nav:hover{background:var(--bg3)}
+        .preview-nav.prev{left:20px}
+        .preview-nav.next{right:20px}
+        .preview-info{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);padding:12px 20px;border-radius:10px;text-align:center;max-width:80%}
+        .preview-info h4{margin-bottom:4px;font-size:14px}
+        .preview-info p{font-size:11px;color:var(--text3)}
+        .preview-note{margin-top:6px;font-size:11px;color:var(--text2);font-style:italic}
+        
+        .hotspot-editor{position:relative;background:var(--bg3);border-radius:8px;overflow:hidden}
+        .hotspot-editor img{width:100%;display:block}
+        .hotspot-editor-layer{position:absolute;inset:0;cursor:crosshair}
+        .drawing-rect{position:absolute;border:2px dashed var(--orange);background:rgba(249,115,22,.2)}
+        
+        .toast-box{position:fixed;bottom:20px;right:20px;z-index:1001}
+        .toast{background:var(--bg4);border-left:3px solid var(--success);padding:10px 14px;border-radius:6px;font-size:12px;margin-top:8px}
+        .toast.err{border-left-color:var(--danger)}
+        
+        input[type="file"]{display:none}
+        ::-webkit-scrollbar{width:6px;height:6px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+    </style>
+</head>
+<body>
+    <div class="page active" id="homePage">
+        <div class="header">
+            <div class="logo">🌳 FlowTree</div>
+            <div style="display:flex;gap:8px">
+                <button class="btn btn-secondary" onclick="importFlows()">📥 Import</button>
+                <button class="btn btn-secondary" onclick="exportAllFlows()">📤 Export All</button>
+                <button class="btn btn-primary" onclick="newFlow()">+ New Flow</button>
+            </div>
+        </div>
+        <div class="home-content">
+            <h1 class="home-title">Your Flows</h1>
+            <p class="home-desc">Create and manage prototype interaction flows with hotspot annotations</p>
+            <p class="home-desc" style="font-size:11px;color:var(--success)" id="storageInfo">💾 Loading storage...</p>
+            <div class="flow-grid" id="flowGrid"></div>
+        </div>
+    </div>
+    
+    <div class="editor" id="editor">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button class="btn-icon" onclick="goHome()">←</button>
+                <div class="sidebar-title" id="flowTitle">Flow</div>
+            </div>
+            <div class="tree" id="tree"></div>
+            <div class="sidebar-footer">
+                <button class="add-btn" onclick="newSection()">+ Add Section</button>
+            </div>
+        </aside>
+        <main class="canvas">
+            <div class="canvas-header">
+                <div>
+                    <h2 class="canvas-title" id="canvasTitle">Select a group</h2>
+                    <p class="canvas-breadcrumb" id="canvasBreadcrumb"></p>
+                </div>
+                <div class="canvas-actions" id="canvasActions"></div>
+            </div>
+            <div class="steps-wrap">
+                <div id="stepsArea"></div>
+            </div>
+        </main>
+        <aside class="panel">
+            <div class="panel-header">Properties</div>
+            <div class="panel-content" id="props"></div>
+        </aside>
+    </div>
+    
+    <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-head" id="modalHead">Title</div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="modalOk">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-bg" id="hotspotModalBg" onclick="if(event.target===this)closeHotspotModal()">
+        <div class="modal" style="max-width:500px">
+            <div class="modal-head">Add Hotspot - Draw a rectangle</div>
+            <div class="modal-body">
+                <div class="hotspot-editor" id="hotspotEditor">
+                    <img id="hotspotEditorImg" src="">
+                    <div class="hotspot-editor-layer" id="hotspotEditorLayer"></div>
+                </div>
+                <div style="margin-top:12px">
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select class="form-input" id="hotspotType" onchange="toggleHotspotFields()">
+                            <option value="link">🔗 跳转热点 (Link)</option>
+                            <option value="annotation">📝 注释标识 (Annotation)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Label</label>
+                        <input class="form-input" id="hotspotLabel" placeholder="e.g., Login Button">
+                    </div>
+                    <div id="linkFields">
+                        <div class="form-group">
+                            <label class="form-label">Action</label>
+                            <select class="form-input" id="hotspotAction"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Jump To</label>
+                            <select class="form-input" id="hotspotTarget"></select>
+                        </div>
+                    </div>
+                    <div id="annotationFields" style="display:none">
+                        <div class="form-group">
+                            <label class="form-label">Description (optional)</label>
+                            <textarea class="form-input form-textarea" id="hotspotDesc" placeholder="Add notes about this area..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeHotspotModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveHotspot()">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-bg preview-bg" id="previewBg" onclick="if(event.target===this)closePreview()">
+        <div class="modal">
+            <div class="modal-head" style="display:flex;justify-content:space-between;align-items:center">
+                <span>Preview - Click hotspots to navigate</span>
+                <span style="cursor:pointer;padding:4px" onclick="closePreview()">✕</span>
+            </div>
+            <div class="preview-body" id="previewArea"></div>
+        </div>
+    </div>
+    
+    <div class="toast-box" id="toastBox"></div>
+    <input type="file" id="fileIn" accept="image/*">
+
+<script>
+let data = [];
+let cur = { flow: null, sec: null, group: null, step: null, prevIdx: 0 };
+let drawState = { drawing: false, startX: 0, startY: 0, rect: null };
+let expanded = { sections: {}, groups: {} };
+let db = null;
+let useIndexedDB = true; // Will be set after checking availability
+
+// ==================== IndexedDB ====================
+const DB_NAME = 'FlowTreeDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'flows';
+
+function checkIndexedDBAvailable() {
+    try {
+        if (!window.indexedDB) {
+            useIndexedDB = false;
+            return false;
+        }
+        // Simple check - if indexedDB exists, assume it's available
+        // Will catch errors during actual operations
+        return true;
+    } catch (e) {
+        useIndexedDB = false;
+        return false;
+    }
+}
+
+function openDB() {
+    if (!useIndexedDB) {
+        return Promise.reject(new Error('IndexedDB not available'));
+    }
+    return new Promise((resolve, reject) => {
+        try {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = () => { 
+                useIndexedDB = false;
+                reject(request.error); 
+            };
+            request.onsuccess = () => { db = request.result; resolve(db); };
+            request.onupgradeneeded = (e) => {
+                const database = e.target.result;
+                if (!database.objectStoreNames.contains(STORE_NAME)) {
+                    database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                }
+            };
+        } catch (e) {
+            useIndexedDB = false;
+            reject(e);
+        }
+    });
+}
+
+async function loadData() {
+    // Check if IndexedDB is available
+    if (!checkIndexedDBAvailable() || !useIndexedDB) {
+        // Use localStorage fallback
+        try {
+            const old = localStorage.getItem('ft3');
+            if (old) {
+                data = JSON.parse(old);
+                toast('Using localStorage (IndexedDB not available)');
+            }
+        } catch (e) { 
+            console.error('Failed to load from localStorage:', e); 
+        }
+        return data;
+    }
+    
+    try {
+        await openDB();
+        const dbData = await new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+        });
+        
+        // If IndexedDB is empty, try to migrate from localStorage
+        if (dbData.length === 0) {
+            try {
+                const old = localStorage.getItem('ft3');
+                if (old) {
+                    data = JSON.parse(old);
+                    if (data.length > 0) {
+                        await saveAllToDB();
+                        localStorage.removeItem('ft3');
+                        toast('Data migrated from localStorage!');
+                        return data;
+                    }
+                }
+            } catch (e2) { 
+                console.error('Migration failed:', e2); 
+            }
+        }
+        
+        data = dbData;
+        return data;
+    } catch (e) {
+        console.error('Failed to load from IndexedDB:', e);
+        useIndexedDB = false;
+        // Fallback: try localStorage
+        try {
+            const old = localStorage.getItem('ft3');
+            if (old) {
+                data = JSON.parse(old);
+                toast('Loaded from localStorage (IndexedDB unavailable)');
+            }
+        } catch (e2) { console.error(e2); }
+        return data;
+    }
+}
+
+async function saveAllToDB() {
+    if (!useIndexedDB) {
+        // Fallback to localStorage
+        try {
+            localStorage.setItem('ft3', JSON.stringify(data));
+            return Promise.resolve();
+        } catch (e) {
+            return Promise.reject(e);
+        }
+    }
+    if (!db) await openDB();
+    return new Promise((resolve, reject) => {
+        try {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            store.clear();
+            data.forEach(flow => store.put(flow));
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => {
+                useIndexedDB = false;
+                // Fallback to localStorage
+                try {
+                    localStorage.setItem('ft3', JSON.stringify(data));
+                    resolve();
+                } catch (e) {
+                    reject(tx.error);
+                }
+            };
+        } catch (e) {
+            useIndexedDB = false;
+            try {
+                localStorage.setItem('ft3', JSON.stringify(data));
+                resolve();
+            } catch (e2) {
+                reject(e);
+            }
+        }
+    });
+}
+
+async function saveFlow(flow) {
+    if (!useIndexedDB) {
+        // Fallback to localStorage - save all data
+        try {
+            localStorage.setItem('ft3', JSON.stringify(data));
+            return Promise.resolve();
+        } catch (e) {
+            return Promise.reject(e);
+        }
+    }
+    if (!db) await openDB();
+    return new Promise((resolve, reject) => {
+        try {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            store.put(flow);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => {
+                useIndexedDB = false;
+                // Fallback to localStorage
+                try {
+                    localStorage.setItem('ft3', JSON.stringify(data));
+                    resolve();
+                } catch (e) {
+                    reject(tx.error);
+                }
+            };
+        } catch (e) {
+            useIndexedDB = false;
+            try {
+                localStorage.setItem('ft3', JSON.stringify(data));
+                resolve();
+            } catch (e2) {
+                reject(e);
+            }
+        }
+    });
+}
+
+async function deleteFlow(flowId) {
+    if (!useIndexedDB) {
+        // Fallback to localStorage
+        try {
+            localStorage.setItem('ft3', JSON.stringify(data));
+            return Promise.resolve();
+        } catch (e) {
+            return Promise.reject(e);
+        }
+    }
+    if (!db) await openDB();
+    return new Promise((resolve, reject) => {
+        try {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            store.delete(flowId);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => {
+                useIndexedDB = false;
+                // Fallback to localStorage
+                try {
+                    localStorage.setItem('ft3', JSON.stringify(data));
+                    resolve();
+                } catch (e) {
+                    reject(tx.error);
+                }
+            };
+        } catch (e) {
+            useIndexedDB = false;
+            try {
+                localStorage.setItem('ft3', JSON.stringify(data));
+                resolve();
+            } catch (e2) {
+                reject(e);
+            }
+        }
+    });
+}
+
+function save() { 
+    if (cur.flow) {
+        saveFlow(cur.flow).catch(e => {
+            console.error('Save failed:', e);
+            toast('Save failed: ' + e.message, true);
+        });
+    } else {
+        saveAllToDB().catch(e => {
+            console.error('Save failed:', e);
+            toast('Save failed: ' + e.message, true);
+        });
+    }
+}
+
+// ==================== Export/Import ====================
+function exportFlow(flowId) {
+    const flow = data.find(f => f.id === flowId);
+    if (!flow) return;
+    const json = JSON.stringify(flow, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${flow.name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')}_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Flow exported!');
+}
+
+function exportAllFlows() {
+    if (!data.length) { toast('No flows to export', true); return; }
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `FlowTree_Backup_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('All flows exported!');
+}
+
+function importFlows() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const imported = JSON.parse(text);
+            let added = 0;
+            if (Array.isArray(imported)) {
+                // Multiple flows
+                for (const flow of imported) {
+                    if (flow.id && flow.name && flow.sections) {
+                        // Check for duplicate
+                        if (data.find(f => f.id === flow.id)) {
+                            flow.id = uid(); // Generate new ID
+                            flow.name += ' (imported)';
+                        }
+                        data.push(flow);
+                        added++;
+                    }
+                }
+            } else if (imported.id && imported.name && imported.sections) {
+                // Single flow
+                if (data.find(f => f.id === imported.id)) {
+                    imported.id = uid();
+                    imported.name += ' (imported)';
+                }
+                data.push(imported);
+                added = 1;
+            } else {
+                throw new Error('Invalid format');
+            }
+            await saveAllToDB();
+            renderHome();
+            toast(`Imported ${added} flow(s)!`);
+        } catch (err) {
+            toast('Import failed: ' + err.message, true);
+        }
+    };
+    input.click();
+}
+
+const ACTIONS = [
+    { id: 'tap', name: 'Tap (点击)' },
+    { id: 'double-tap', name: 'Double Tap (双击)' },
+    { id: 'long-press', name: 'Long Press (长按)' },
+    { id: 'swipe-left', name: 'Swipe Left (左滑)' },
+    { id: 'swipe-right', name: 'Swipe Right (右滑)' },
+    { id: 'swipe-up', name: 'Swipe Up (上滑)' },
+    { id: 'swipe-down', name: 'Swipe Down (下滑)' },
+    { id: 'input', name: 'Input (输入)' },
+    { id: 'scroll', name: 'Scroll (滚动)' }
+];
+
+function save() { localStorage.setItem('ft3', JSON.stringify(data)); }
+function uid() { return Math.random().toString(36).slice(2, 10); }
+function toast(msg, err) {
+    const d = document.createElement('div');
+    d.className = 'toast' + (err ? ' err' : '');
+    d.textContent = msg;
+    document.getElementById('toastBox').appendChild(d);
+    setTimeout(() => d.remove(), 2500);
+}
+
+function modal(title, html, fn) {
+    document.getElementById('modalHead').textContent = title;
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalBg').classList.add('show');
+    document.getElementById('modalOk').onclick = () => { fn(); closeModal(); };
+    setTimeout(() => document.querySelector('#modalBody input')?.focus(), 50);
+}
+function closeModal() { document.getElementById('modalBg').classList.remove('show'); }
+
+// Count all steps in flow
+function countSteps(flow) {
+    let count = 0;
+    flow.sections?.forEach(s => s.groups?.forEach(g => count += g.steps?.length || 0));
+    return count;
+}
+
+// ==================== HOME ====================
+function renderHome() {
+    const g = document.getElementById('flowGrid');
+    g.innerHTML = `<div class="flow-card new-flow-card" onclick="newFlow()"><div style="font-size:28px">+</div><div>New Flow</div></div>`;
+    data.forEach(f => {
+        const stepCount = countSteps(f);
+        const groupCount = f.sections?.reduce((sum, s) => sum + (s.groups?.length || 0), 0) || 0;
+        let imgs = [];
+        f.sections?.forEach(s => s.groups?.forEach(g => g.steps?.forEach(st => { if (st.img && imgs.length < 3) imgs.push(st.img); })));
+        g.innerHTML += `
+            <div class="flow-card" onclick="openFlow('${f.id}')">
+                <div class="flow-card-actions">
+                    <button class="btn-icon" onclick="event.stopPropagation();exportFlow('${f.id}')" title="Export">📤</button>
+                    <button class="btn-icon" onclick="event.stopPropagation();editFlow('${f.id}')" title="Edit">✎</button>
+                    <button class="btn-icon" onclick="event.stopPropagation();delFlow('${f.id}')" title="Delete">🗑</button>
+                </div>
+                <div class="flow-card-preview">
+                    ${imgs.length ? imgs.map(i => `<div class="flow-card-thumb"><img src="${i}"></div>`).join('') : '<span style="color:var(--text3);font-size:12px">No screens</span>'}
+                </div>
+                <div class="flow-card-body">
+                    <div class="flow-card-title">${f.name}</div>
+                    <div class="flow-card-meta">${stepCount} screens · ${groupCount} groups · ${f.sections?.length || 0} sections</div>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function newFlow() {
+    modal('New Flow', '<div class="form-group"><label class="form-label">Flow Name</label><input class="form-input" id="inp" placeholder="e.g., E-commerce App"></div>', () => {
+        const n = document.getElementById('inp').value.trim();
+        if (n) {
+            const secId = uid(), grpId = uid();
+            data.push({ 
+                id: uid(), 
+                name: n, 
+                sections: [{ 
+                    id: secId, 
+                    name: 'Main', 
+                    groups: [{ id: grpId, name: 'Default Group', steps: [], layout: 'linear' }] 
+                }] 
+            });
+            save(); renderHome(); toast('Flow created');
+        }
+    });
+}
+
+function editFlow(fid) {
+    const f = data.find(x => x.id === fid);
+    modal('Edit Flow', `<div class="form-group"><label class="form-label">Flow Name</label><input class="form-input" id="inp" value="${f.name}"></div>`, () => {
+        f.name = document.getElementById('inp').value.trim() || f.name;
+        save(); renderHome(); if (cur.flow?.id === fid) document.getElementById('flowTitle').textContent = f.name;
+        toast('Updated');
+    });
+}
+
+async function delFlow(fid) {
+    if (confirm('Delete this flow?')) {
+        data = data.filter(f => f.id !== fid);
+        await deleteFlow(fid);
+        renderHome(); toast('Deleted');
+    }
+}
+
+function openFlow(fid) {
+    cur.flow = data.find(f => f.id === fid);
+    cur.sec = cur.flow.sections?.[0]?.id || null;
+    cur.group = cur.flow.sections?.[0]?.groups?.[0]?.id || null;
+    cur.step = null;
+    expanded.sections[cur.sec] = true;
+    if (cur.group) expanded.groups[cur.group] = true;
+    document.getElementById('homePage').classList.remove('active');
+    document.getElementById('editor').classList.add('active');
+    render();
+}
+
+function goHome() {
+    cur.flow = cur.sec = cur.group = cur.step = null;
+    document.getElementById('editor').classList.remove('active');
+    document.getElementById('homePage').classList.add('active');
+    renderHome();
+}
+
+// ==================== EDITOR ====================
+function render() {
+    document.getElementById('flowTitle').textContent = cur.flow.name;
+    renderTree();
+    renderCanvas();
+    renderProps();
+}
+
+function renderTree() {
+    const t = document.getElementById('tree');
+    t.innerHTML = '';
+    
+    cur.flow.sections?.forEach(sec => {
+        const secDiv = document.createElement('div');
+        secDiv.className = 'tree-section';
+        const secOpen = expanded.sections[sec.id];
+        const secStepCount = sec.groups?.reduce((sum, g) => sum + (g.steps?.length || 0), 0) || 0;
+        
+        secDiv.innerHTML = `
+            <div class="tree-header ${cur.sec === sec.id && !cur.group ? 'active' : ''}">
+                <span class="arrow ${secOpen ? 'open' : ''}">▶</span>
+                <span class="tree-name">${sec.name}</span>
+                <span class="tree-count">${secStepCount}</span>
+                <button class="tree-btn" title="Edit">✎</button>
+                <button class="tree-btn del" title="Delete">✕</button>
+            </div>
+        `;
+        
+        const secHeader = secDiv.querySelector('.tree-header');
+        secHeader.onclick = (e) => {
+            if (e.target.classList.contains('tree-btn')) return;
+            expanded.sections[sec.id] = !expanded.sections[sec.id];
+            render();
+        };
+        secDiv.querySelector('.tree-btn:not(.del)').onclick = (e) => { e.stopPropagation(); editSection(sec.id); };
+        secDiv.querySelector('.tree-btn.del').onclick = (e) => { e.stopPropagation(); delSection(sec.id); };
+        
+        if (secOpen && sec.groups) {
+            const groupsWrap = document.createElement('div');
+            groupsWrap.className = 'tree-group';
+            
+            sec.groups.forEach(grp => {
+                const grpDiv = document.createElement('div');
+                const grpOpen = expanded.groups[grp.id];
+                
+                grpDiv.innerHTML = `
+                    <div class="tree-header ${cur.group === grp.id ? 'active' : ''}">
+                        <span class="arrow ${grpOpen ? 'open' : ''}">▶</span>
+                        <span class="tree-name">${grp.name}</span>
+                        <span class="tree-count">${grp.steps?.length || 0}</span>
+                        <button class="tree-btn" title="Edit">✎</button>
+                        <button class="tree-btn del" title="Delete">✕</button>
+                    </div>
+                `;
+                
+                const grpHeader = grpDiv.querySelector('.tree-header');
+                grpHeader.onclick = (e) => {
+                    if (e.target.classList.contains('tree-btn')) return;
+                    cur.sec = sec.id;
+                    cur.group = grp.id;
+                    cur.step = null;
+                    expanded.groups[grp.id] = !expanded.groups[grp.id];
+                    render();
+                };
+                grpDiv.querySelector('.tree-btn:not(.del)').onclick = (e) => { e.stopPropagation(); editGroup(sec.id, grp.id); };
+                grpDiv.querySelector('.tree-btn.del').onclick = (e) => { e.stopPropagation(); delGroup(sec.id, grp.id); };
+                
+                if (grpOpen && grp.steps?.length) {
+                    const stepsWrap = document.createElement('div');
+                    stepsWrap.className = 'tree-steps';
+                    grp.steps.forEach(st => {
+                        const stepEl = document.createElement('div');
+                        stepEl.className = 'tree-step' + (cur.step === st.id ? ' active' : '');
+                        stepEl.textContent = st.name;
+                        stepEl.onclick = () => { cur.sec = sec.id; cur.group = grp.id; cur.step = st.id; render(); };
+                        stepsWrap.appendChild(stepEl);
+                    });
+                    grpDiv.appendChild(stepsWrap);
+                }
+                
+                groupsWrap.appendChild(grpDiv);
+            });
+            
+            // Add group button
+            const addGrp = document.createElement('div');
+            addGrp.className = 'tree-add';
+            addGrp.innerHTML = '+ Add Group';
+            addGrp.onclick = () => newGroup(sec.id);
+            groupsWrap.appendChild(addGrp);
+            
+            secDiv.appendChild(groupsWrap);
+        }
+        
+        t.appendChild(secDiv);
+    });
+}
+
+function renderCanvas() {
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    
+    if (!grp) {
+        document.getElementById('canvasTitle').textContent = 'Select a group';
+        document.getElementById('canvasBreadcrumb').textContent = '';
+        document.getElementById('canvasActions').innerHTML = '';
+        document.getElementById('stepsArea').innerHTML = '<div class="empty">Select a group from the sidebar to view its steps</div>';
+        return;
+    }
+    
+    document.getElementById('canvasTitle').textContent = grp.name;
+    document.getElementById('canvasBreadcrumb').textContent = `${cur.flow.name} / ${sec.name} / ${grp.name}`;
+    // Ensure layout field exists (backward compatibility)
+    if (!grp.layout) grp.layout = 'linear';
+    const isParallel = grp.layout === 'parallel';
+    document.getElementById('canvasActions').innerHTML = `
+        <button class="btn btn-secondary" onclick="toggleGroupLayout()" title="${isParallel ? 'Switch to Linear' : 'Switch to Parallel'}">
+            ${isParallel ? '→' : '⧉'} ${isParallel ? 'Linear' : 'Parallel'}
+        </button>
+        <button class="btn btn-secondary" onclick="preview()">▶ Preview</button>
+        <button class="btn btn-primary" onclick="newStep()">+ Add Step</button>
+    `;
+    
+    const area = document.getElementById('stepsArea');
+    if (!grp.steps?.length) {
+        area.innerHTML = '<div class="empty">No steps yet. Click "+ Add Step" to start.</div>';
+        return;
+    }
+    
+    let html = `<div class="steps ${isParallel ? 'parallel' : ''}">`;
+    const stepsPerRow = isParallel ? 3 : 1; // Assume 3 columns per row in parallel mode
+    
+    grp.steps.forEach((st, i) => {
+        const hc = st.hotspots?.length || 0;
+        html += `
+            <div class="step ${cur.step === st.id ? 'active' : ''}" onclick="cur.step='${st.id}';render()">
+                <div class="step-image">
+                    ${st.img ? `<img src="${st.img}">` : '<div class="step-image-empty">No image</div>'}
+                    ${hc ? `<div class="step-hotspot-count">${hc}</div>` : ''}
+                </div>
+                <div class="step-info">
+                    <div class="step-name">${st.name}</div>
+                    <div class="step-action">${st.note ? '📝 ' : ''}${ACTIONS.find(a => a.id === st.action)?.name.split(' ')[0] || st.action}</div>
+                </div>
+            </div>
+        `;
+        
+        if (isParallel) {
+            // In parallel mode, add down arrow at end of each row (except last row)
+            if ((i + 1) % stepsPerRow === 0 && i < grp.steps.length - 1) {
+                html += `<div class="step-connector parallel">↓</div>`;
+            }
+        } else {
+            // In linear mode, add right arrow between steps
+            if (i < grp.steps.length - 1) html += '<div class="step-connector">→</div>';
+        }
+    });
+    html += '</div>';
+    area.innerHTML = html;
+}
+
+function renderProps() {
+    const p = document.getElementById('props');
+    if (!cur.step) {
+        p.innerHTML = '<div class="empty">Select a step to edit</div>';
+        return;
+    }
+    
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    const st = grp?.steps?.find(s => s.id === cur.step);
+    if (!st) { p.innerHTML = '<div class="empty">Step not found</div>'; return; }
+    
+    if (!st.hotspots) st.hotspots = [];
+    
+    p.innerHTML = `
+        <div class="panel-section">
+            <div class="panel-section-title">Basic Info</div>
+            <div class="form-group">
+                <label class="form-label">Screen Name</label>
+                <input class="form-input" value="${st.name}" oninput="updStepSilent('name',this.value)" onblur="render()">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Screenshot</label>
+                <div class="upload ${st.img ? 'has-img' : ''}" onclick="uploadImg('${st.id}')">
+                    ${st.img ? `<div class="upload-img-wrap"><img src="${st.img}"><div class="upload-hint">Click to replace</div></div>` : '<div style="color:var(--text3);font-size:11px">Click to upload</div>'}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea class="form-input form-textarea" placeholder="Add notes..." oninput="updStepSilent('note',this.value)" onblur="render()">${st.note || ''}</textarea>
+            </div>
+        </div>
+        <div class="panel-section">
+            <div class="panel-section-title">
+                <span>Hotspots (${st.hotspots.length})</span>
+                ${st.img ? `<button class="btn btn-secondary btn-sm" onclick="openHotspotEditor()">+ Add</button>` : ''}
+            </div>
+            ${!st.img ? '<div style="font-size:11px;color:var(--text3)">Upload image first</div>' : ''}
+            <div id="hotspotList">
+                ${st.hotspots.map((h, i) => `
+                    <div class="hotspot-item">
+                        <div class="hotspot-color ${h.type === 'annotation' ? 'annotation' : ''}"></div>
+                        <div class="hotspot-info">
+                            <div class="hotspot-name">${h.type === 'annotation' ? '📝 ' : '🔗 '}${h.label || 'Hotspot ' + (i + 1)}</div>
+                            <div class="hotspot-target">${h.type === 'annotation' ? (h.description || 'No description') : (h.action + ' → ' + (h.targetName || 'No target'))}</div>
+                        </div>
+                        <span class="hotspot-del" onclick="delHotspot(${i})">✕</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        <button class="btn btn-danger" style="width:100%;margin-top:12px" id="deleteStepBtn">Delete Step</button>
+    `;
+    
+    // Attach delete handler
+    document.getElementById('deleteStepBtn').onclick = function() {
+        if (confirm('Delete this step?')) {
+            const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+            const grp = sec?.groups?.find(g => g.id === cur.group);
+            if (grp) {
+                grp.steps = grp.steps.filter(s => s.id !== cur.step);
+                cur.step = null;
+                save();
+                render();
+                toast('Step deleted');
+            }
+        }
+    };
+}
+
+// ==================== SECTION CRUD ====================
+function newSection() {
+    modal('New Section', '<div class="form-group"><label class="form-label">Section Name</label><input class="form-input" id="inp" placeholder="e.g., Onboarding"></div>', () => {
+        const n = document.getElementById('inp').value.trim();
+        if (n) {
+            const secId = uid(), grpId = uid();
+            cur.flow.sections.push({ id: secId, name: n, groups: [{ id: grpId, name: 'Default Group', steps: [], layout: 'linear' }] });
+            cur.sec = secId;
+            cur.group = grpId;
+            cur.step = null;
+            expanded.sections[secId] = true;
+            expanded.groups[grpId] = true;
+            save(); render(); toast('Section added');
+        }
+    });
+}
+
+function editSection(sid) {
+    const s = cur.flow.sections.find(x => x.id === sid);
+    modal('Edit Section', `<div class="form-group"><label class="form-label">Section Name</label><input class="form-input" id="inp" value="${s.name}"></div>`, () => {
+        s.name = document.getElementById('inp').value.trim() || s.name;
+        save(); render(); toast('Updated');
+    });
+}
+
+function delSection(sid) {
+    if (cur.flow.sections.length <= 1) { toast('Cannot delete only section', true); return; }
+    if (confirm('Delete this section?')) {
+        cur.flow.sections = cur.flow.sections.filter(s => s.id !== sid);
+        if (cur.sec === sid) {
+            cur.sec = cur.flow.sections[0]?.id;
+            cur.group = cur.flow.sections[0]?.groups?.[0]?.id;
+            cur.step = null;
+        }
+        save(); render(); toast('Deleted');
+    }
+}
+
+// ==================== GROUP CRUD ====================
+function newGroup(secId) {
+    modal('New Group', '<div class="form-group"><label class="form-label">Group Name</label><input class="form-input" id="inp" placeholder="e.g., Login Flow"></div>', () => {
+        const n = document.getElementById('inp').value.trim();
+        if (n) {
+            const sec = cur.flow.sections.find(s => s.id === secId);
+            const grpId = uid();
+            sec.groups.push({ id: grpId, name: n, steps: [], layout: 'linear' });
+            cur.sec = secId;
+            cur.group = grpId;
+            cur.step = null;
+            expanded.groups[grpId] = true;
+            save(); render(); toast('Group added');
+        }
+    });
+}
+
+function editGroup(secId, grpId) {
+    const sec = cur.flow.sections.find(s => s.id === secId);
+    const grp = sec.groups.find(g => g.id === grpId);
+    modal('Edit Group', `<div class="form-group"><label class="form-label">Group Name</label><input class="form-input" id="inp" value="${grp.name}"></div>`, () => {
+        grp.name = document.getElementById('inp').value.trim() || grp.name;
+        save(); render(); toast('Updated');
+    });
+}
+
+function delGroup(secId, grpId) {
+    const sec = cur.flow.sections.find(s => s.id === secId);
+    if (sec.groups.length <= 1) { toast('Cannot delete only group', true); return; }
+    if (confirm('Delete this group?')) {
+        sec.groups = sec.groups.filter(g => g.id !== grpId);
+        if (cur.group === grpId) {
+            cur.group = sec.groups[0]?.id;
+            cur.step = null;
+        }
+        save(); render(); toast('Deleted');
+    }
+}
+
+function toggleGroupLayout() {
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    if (grp) {
+        // Ensure layout field exists
+        if (!grp.layout) grp.layout = 'linear';
+        grp.layout = grp.layout === 'linear' ? 'parallel' : 'linear';
+        save(); render(); toast(`Switched to ${grp.layout} layout`);
+    }
+}
+
+// ==================== STEP CRUD ====================
+function newStep() {
+    modal('New Step', `
+        <div class="form-group"><label class="form-label">Screen Name</label><input class="form-input" id="inp" placeholder="e.g., Login Screen"></div>
+        <div class="form-group"><label class="form-label">Action</label><select class="form-input" id="act">${ACTIONS.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select></div>
+    `, () => {
+        const n = document.getElementById('inp').value.trim();
+        if (n) {
+            const sec = cur.flow.sections.find(s => s.id === cur.sec);
+            const grp = sec?.groups?.find(g => g.id === cur.group);
+            if (grp) {
+                const st = { id: uid(), name: n, action: document.getElementById('act').value, img: null, note: '', hotspots: [] };
+                grp.steps.push(st);
+                cur.step = st.id;
+                save(); render(); toast('Step added');
+            }
+        }
+    });
+}
+
+function updStep(k, v) {
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    const st = grp?.steps?.find(s => s.id === cur.step);
+    if (st) { st[k] = v; save(); render(); }
+}
+
+// Update step without re-rendering (for real-time input saving)
+function updStepSilent(k, v) {
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    const st = grp?.steps?.find(s => s.id === cur.step);
+    if (st) { st[k] = v; save(); }
+}
+
+// ==================== IMAGE ====================
+let uploadId = null;
+function uploadImg(sid) {
+    uploadId = sid;
+    document.getElementById('fileIn').click();
+}
+
+// Keep original image quality - no compression
+function compressImage(dataUrl) {
+    // Return original image without any compression
+    return Promise.resolve(dataUrl);
+}
+
+document.getElementById('fileIn').onchange = async function(e) {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = async function(ev) {
+        // Compress image before saving
+        const compressed = await compressImage(ev.target.result);
+        cur.flow.sections?.forEach(sec => {
+            sec.groups?.forEach(grp => {
+                const st = grp.steps?.find(s => s.id === uploadId);
+                if (st) { st.img = compressed; save(); render(); toast('Uploaded'); }
+            });
+        });
+    };
+    r.readAsDataURL(f);
+    e.target.value = '';
+};
+
+// ==================== HOTSPOT ====================
+function toggleHotspotFields() {
+    const type = document.getElementById('hotspotType').value;
+    document.getElementById('linkFields').style.display = type === 'link' ? 'block' : 'none';
+    document.getElementById('annotationFields').style.display = type === 'annotation' ? 'block' : 'none';
+}
+
+function openHotspotEditor() {
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    const st = grp?.steps?.find(s => s.id === cur.step);
+    if (!st?.img) return;
+    
+    document.getElementById('hotspotEditorImg').src = st.img;
+    document.getElementById('hotspotAction').innerHTML = ACTIONS.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+    
+    let allSteps = [];
+    cur.flow.sections?.forEach(sec => sec.groups?.forEach(grp => grp.steps?.forEach(s => {
+        if (s.id !== cur.step) allSteps.push({ ...s, path: `${sec.name} / ${grp.name}` });
+    })));
+    document.getElementById('hotspotTarget').innerHTML = `<option value="">-- No target --</option>` + 
+        allSteps.map(s => `<option value="${s.id}">${s.path} / ${s.name}</option>`).join('');
+    
+    document.getElementById('hotspotLabel').value = '';
+    document.getElementById('hotspotType').value = 'link';
+    document.getElementById('hotspotDesc').value = '';
+    toggleHotspotFields();
+    document.getElementById('hotspotModalBg').classList.add('show');
+    drawState = { drawing: false, startX: 0, startY: 0, rect: null };
+    document.getElementById('hotspotEditorLayer').innerHTML = '';
+    setupDrawing();
+}
+
+function setupDrawing() {
+    const layer = document.getElementById('hotspotEditorLayer');
+    layer.onmousedown = function(e) {
+        const rect = layer.getBoundingClientRect();
+        drawState.drawing = true;
+        drawState.startX = e.clientX - rect.left;
+        drawState.startY = e.clientY - rect.top;
+        const div = document.createElement('div');
+        div.className = 'drawing-rect';
+        div.style.left = drawState.startX + 'px';
+        div.style.top = drawState.startY + 'px';
+        layer.innerHTML = '';
+        layer.appendChild(div);
+        drawState.rect = div;
+    };
+    layer.onmousemove = function(e) {
+        if (!drawState.drawing || !drawState.rect) return;
+        const rect = layer.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        drawState.rect.style.left = Math.min(drawState.startX, x) + 'px';
+        drawState.rect.style.top = Math.min(drawState.startY, y) + 'px';
+        drawState.rect.style.width = Math.abs(x - drawState.startX) + 'px';
+        drawState.rect.style.height = Math.abs(y - drawState.startY) + 'px';
+    };
+    layer.onmouseup = () => drawState.drawing = false;
+}
+
+function saveHotspot() {
+    const layer = document.getElementById('hotspotEditorLayer');
+    const rect = layer.querySelector('.drawing-rect');
+    if (!rect || rect.offsetWidth < 10 || rect.offsetHeight < 10) {
+        toast('Draw a hotspot area first', true); return;
+    }
+    const layerRect = layer.getBoundingClientRect();
+    const x = (parseFloat(rect.style.left) / layerRect.width) * 100;
+    const y = (parseFloat(rect.style.top) / layerRect.height) * 100;
+    const w = (rect.offsetWidth / layerRect.width) * 100;
+    const h = (rect.offsetHeight / layerRect.height) * 100;
+    
+    const type = document.getElementById('hotspotType').value;
+    const targetId = document.getElementById('hotspotTarget').value;
+    const targetOpt = document.getElementById('hotspotTarget').selectedOptions[0];
+    
+    const hotspot = {
+        id: uid(), x, y, w, h,
+        type: type, // 'link' or 'annotation'
+        label: document.getElementById('hotspotLabel').value.trim() || (type === 'annotation' ? 'Annotation' : 'Hotspot'),
+        action: type === 'link' ? document.getElementById('hotspotAction').value : null,
+        targetId: type === 'link' ? (targetId || null) : null,
+        targetName: type === 'link' && targetId ? targetOpt.textContent : null,
+        description: type === 'annotation' ? document.getElementById('hotspotDesc').value.trim() : null
+    };
+    
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    const st = grp?.steps?.find(s => s.id === cur.step);
+    if (st) {
+        if (!st.hotspots) st.hotspots = [];
+        st.hotspots.push(hotspot);
+        save(); toast(type === 'annotation' ? 'Annotation added' : 'Hotspot added');
+    }
+    closeHotspotModal();
+    render();
+}
+
+function closeHotspotModal() { document.getElementById('hotspotModalBg').classList.remove('show'); }
+
+function delHotspot(idx) {
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    const st = grp?.steps?.find(s => s.id === cur.step);
+    if (st) {
+        st.hotspots.splice(idx, 1);
+        save(); render(); toast('Deleted');
+    }
+}
+
+// ==================== PREVIEW ====================
+function preview() {
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    if (!grp?.steps?.length) { toast('No steps to preview', true); return; }
+    cur.prevIdx = 0;
+    renderPreview();
+    document.getElementById('previewBg').classList.add('show');
+}
+
+function renderPreview() {
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    const st = grp.steps[cur.prevIdx];
+    
+    let hotspotsHtml = '';
+    if (st.hotspots?.length) {
+        hotspotsHtml = st.hotspots.map(h => {
+            const isAnnotation = h.type === 'annotation';
+            const tooltipText = isAnnotation 
+                ? `${h.label}${h.description ? ': ' + h.description : ''}`
+                : `${h.label}: ${h.action}`;
+            return `
+                <div class="preview-hotspot ${isAnnotation ? 'annotation' : ''}" 
+                     style="left:${h.x}%;top:${h.y}%;width:${h.w}%;height:${h.h}%"
+                     ${isAnnotation ? '' : `onclick="jumpTo('${h.targetId}')"`}
+                     title="${tooltipText}">
+                    <span class="preview-hotspot-label">${isAnnotation ? '📝 ' : '🔗 '}${h.label}</span>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    document.getElementById('previewArea').innerHTML = `
+        ${st.img ? `<div class="preview-screen"><img src="${st.img}">${hotspotsHtml}</div>` : '<div style="color:var(--text3)">No image</div>'}
+        ${cur.prevIdx > 0 ? `<div class="preview-nav prev" onclick="cur.prevIdx--;renderPreview()">←</div>` : ''}
+        ${cur.prevIdx < grp.steps.length - 1 ? `<div class="preview-nav next" onclick="cur.prevIdx++;renderPreview()">→</div>` : ''}
+        <div class="preview-info">
+            <h4>${st.name}</h4>
+            <p>${cur.prevIdx + 1}/${grp.steps.length} · ${st.hotspots?.length || 0} hotspots</p>
+            ${st.note ? `<div class="preview-note">"${st.note}"</div>` : ''}
+        </div>
+    `;
+}
+
+function jumpTo(targetId) {
+    if (!targetId) { toast('No target', true); return; }
+    const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+    const grp = sec?.groups?.find(g => g.id === cur.group);
+    const idx = grp?.steps?.findIndex(s => s.id === targetId);
+    if (idx !== -1) {
+        cur.prevIdx = idx;
+        renderPreview();
+        toast('Jumped to: ' + grp.steps[idx].name);
+    } else {
+        toast('Target not in current group', true);
+    }
+}
+
+function closePreview() { document.getElementById('previewBg').classList.remove('show'); }
+
+document.onkeydown = e => {
+    if (e.key === 'Escape') { closeModal(); closeHotspotModal(); closePreview(); }
+    if (document.getElementById('previewBg').classList.contains('show')) {
+        const sec = cur.flow.sections?.find(s => s.id === cur.sec);
+        const grp = sec?.groups?.find(g => g.id === cur.group);
+        if (e.key === 'ArrowLeft' && cur.prevIdx > 0) { cur.prevIdx--; renderPreview(); }
+        if (e.key === 'ArrowRight' && grp && cur.prevIdx < grp.steps.length - 1) { cur.prevIdx++; renderPreview(); }
+    }
+};
+
+// Initialize app
+(async function init() {
+    await loadData();
+    // Update storage info
+    const infoEl = document.getElementById('storageInfo');
+    if (infoEl) {
+        if (useIndexedDB) {
+            infoEl.textContent = '💾 Using IndexedDB - supports large files | 📤 Export JSON to share with others';
+            infoEl.style.color = 'var(--success)';
+        } else {
+            infoEl.textContent = '💾 Using localStorage (IndexedDB not available) | 📤 Export JSON to share with others';
+            infoEl.style.color = 'var(--orange)';
+        }
+    }
+    renderHome();
+})();
+</script>
+</body>
+</html>

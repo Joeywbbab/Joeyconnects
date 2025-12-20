@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
-import { Lightbulb, Package, Plus, Clock, Users, ThumbsUp, Calendar, ExternalLink } from 'lucide-react';
+import { Lightbulb, Package, Plus, ThumbsUp, Calendar } from 'lucide-react';
 
 interface Idea {
   id: string;
@@ -20,18 +20,12 @@ interface Product {
   creator_email: string;
   actual_days: number;
   product_url?: string;
+  app_path?: string;
   image_url?: string;
   created_at: string;
   dwfm_count?: number;
   idea_id?: string;
 }
-
-// Calculate product price based on actual days and claims
-const calculatePrice = (actualDays: number, claimsCount: number = 0): number => {
-  const basePrice = actualDays * 10; // 10 points per day
-  const supplyDiscount = claimsCount > 1 ? 0.9 : 1; // 10% off if multiple people built it
-  return Math.round(basePrice * supplyDiscount);
-};
 
 type Tab = 'ideas' | 'products';
 
@@ -43,6 +37,8 @@ export const StoreApp: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showIdeaForm, setShowIdeaForm] = useState(false);
   const [showProductForm, setShowProductForm] = useState(false);
+  const [isSubmittingIdea, setIsSubmittingIdea] = useState(false);
+  const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
 
   // Form states
   const [newIdea, setNewIdea] = useState({
@@ -56,48 +52,108 @@ export const StoreApp: React.FC = () => {
     description: '',
     actual_days: 7,
     product_url: '',
+    app_path: '',
     idea_id: ''
   });
 
-  // Helper function to prefill FlowTree data
-  const prefillFlowTree = () => {
-    setNewProduct({
-      title: 'FlowTree 🌳',
-      description: 'A powerful prototype interaction flow management tool. Features: Interactive flow management with screenshots, Jump hotspots for navigation, Comment markers for annotations, Linear/Parallel layouts, IndexedDB storage for large data, Import/Export in JSON, High-quality preview. Built with pure HTML/CSS/JavaScript, no server required.',
-      actual_days: 14,
-      product_url: 'https://github.com/yourusername/flowtree',
-      idea_id: ''
-    });
-    setShowProductForm(true);
+  // Initialize FlowTree product if it doesn't exist
+  const initializeFlowTree = async () => {
+    if (!supabase) return;
+
+    // Check localStorage cache to avoid unnecessary DB queries
+    const initialized = localStorage.getItem('flowtree_initialized');
+    if (initialized === 'true') return;
+
+    try {
+      // Check if FlowTree product already exists
+      const { data: existing, error: checkError } = await supabase
+        .from('products')
+        .select('id')
+        .eq('title', 'FlowTree 🌳')
+        .maybeSingle();
+
+      if (checkError) {
+        return;
+      }
+
+      // If exists, mark as initialized and return
+      if (existing) {
+        localStorage.setItem('flowtree_initialized', 'true');
+        return;
+      }
+
+      // Create FlowTree product only once
+      const { error } = await supabase.from('products').insert({
+        title: 'FlowTree 🌳',
+        description: 'A powerful prototype interaction flow management tool. Features: Interactive flow management with screenshots, Jump hotspots for navigation, Comment markers for annotations, Linear/Parallel layouts, IndexedDB storage for large data, Import/Export in JSON, High-quality preview. Built with pure HTML/CSS/JavaScript, no server required.',
+        actual_days: 14,
+        product_url: '',
+        app_path: '/products/flowtree/app/app.html',
+        creator_id: null,
+        creator_email: 'system@joeyconnects.world'
+      });
+
+      if (!error) {
+        localStorage.setItem('flowtree_initialized', 'true');
+        fetchProducts(); // Refresh to show FlowTree
+      }
+    } catch (error) {
+      // Silent fail - don't show errors to user
+    }
   };
 
   useEffect(() => {
     fetchIdeas();
     fetchProducts();
+    initializeFlowTree();
   }, []);
+
+  // Handle ESC key to close modals
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showProductForm) setShowProductForm(false);
+        if (showIdeaForm) setShowIdeaForm(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showProductForm, showIdeaForm]);
 
   const fetchIdeas = async () => {
     if (!supabase) return;
     setLoading(true);
     try {
-      // Fetch ideas with claims count
+      // Fetch ideas
       const { data: ideasData, error } = await supabase
         .from('ideas')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      if (!ideasData || ideasData.length === 0) {
+        setIdeas([]);
+        return;
+      }
 
-      // Fetch claims count for each idea
-      const ideasWithCounts = await Promise.all(
-        (ideasData || []).map(async (idea) => {
-          const { count } = await supabase
-            .from('claims')
-            .select('*', { count: 'exact', head: true })
-            .eq('idea_id', idea.id);
-          return { ...idea, claims_count: count || 0 };
-        })
-      );
+      // Fetch all claims counts in one query
+      const { data: claimsData } = await supabase
+        .from('claims')
+        .select('idea_id')
+        .in('idea_id', ideasData.map(i => i.id));
+
+      // Build counts map
+      const countsMap = (claimsData || []).reduce((acc, claim) => {
+        acc[claim.idea_id] = (acc[claim.idea_id] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Merge counts with ideas
+      const ideasWithCounts = ideasData.map(idea => ({
+        ...idea,
+        claims_count: countsMap[idea.id] || 0
+      }));
 
       setIdeas(ideasWithCounts);
     } catch (error) {
@@ -110,24 +166,35 @@ export const StoreApp: React.FC = () => {
   const fetchProducts = async () => {
     if (!supabase) return;
     try {
-      // Fetch products with DWFM count
+      // Fetch products
       const { data: productsData, error } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      if (!productsData || productsData.length === 0) {
+        setProducts([]);
+        return;
+      }
 
-      // Fetch DWFM count for each product
-      const productsWithCounts = await Promise.all(
-        (productsData || []).map(async (product) => {
-          const { count } = await supabase
-            .from('does_work_for_me')
-            .select('*', { count: 'exact', head: true })
-            .eq('product_id', product.id);
-          return { ...product, dwfm_count: count || 0 };
-        })
-      );
+      // Fetch all DWFM counts in one query
+      const { data: dwfmData } = await supabase
+        .from('does_work_for_me')
+        .select('product_id')
+        .in('product_id', productsData.map(p => p.id));
+
+      // Build counts map
+      const countsMap = (dwfmData || []).reduce((acc, vote) => {
+        acc[vote.product_id] = (acc[vote.product_id] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Merge counts with products
+      const productsWithCounts = productsData.map(product => ({
+        ...product,
+        dwfm_count: countsMap[product.id] || 0
+      }));
 
       setProducts(productsWithCounts);
     } catch (error) {
@@ -137,8 +204,9 @@ export const StoreApp: React.FC = () => {
 
   const handleCreateIdea = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!supabase || !user) return;
+    if (!supabase || !user || isSubmittingIdea) return;
 
+    setIsSubmittingIdea(true);
     try {
       const { error } = await supabase.from('ideas').insert({
         title: newIdea.title,
@@ -156,6 +224,8 @@ export const StoreApp: React.FC = () => {
     } catch (error) {
       console.error('Error creating idea:', error);
       alert('Failed to create idea');
+    } finally {
+      setIsSubmittingIdea(false);
     }
   };
 
@@ -190,14 +260,16 @@ export const StoreApp: React.FC = () => {
 
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!supabase || !user) return;
+    if (!supabase || !user || isSubmittingProduct) return;
 
+    setIsSubmittingProduct(true);
     try {
       const { error } = await supabase.from('products').insert({
         title: newProduct.title,
         description: newProduct.description,
         actual_days: newProduct.actual_days,
         product_url: newProduct.product_url || null,
+        app_path: newProduct.app_path || null,
         idea_id: newProduct.idea_id || null,
         creator_id: user.id,
         creator_email: user.email
@@ -205,12 +277,27 @@ export const StoreApp: React.FC = () => {
 
       if (error) throw error;
 
-      setNewProduct({ title: '', description: '', actual_days: 7, product_url: '', idea_id: '' });
+      setNewProduct({ title: '', description: '', actual_days: 7, product_url: '', app_path: '', idea_id: '' });
       setShowProductForm(false);
       fetchProducts();
     } catch (error) {
       console.error('Error creating product:', error);
       alert('Failed to create product');
+    } finally {
+      setIsSubmittingProduct(false);
+    }
+  };
+
+  const handleUseProduct = (product: Product) => {
+    // If app_path exists, open it in iframe or new window
+    if (product.app_path) {
+      // Open in new window for now (can be changed to iframe later)
+      window.open(product.app_path, '_blank', 'width=1200,height=800');
+    } else if (product.product_url) {
+      // Fallback to external URL
+      window.open(product.product_url, '_blank');
+    } else {
+      alert('No app path or URL available for this product');
     }
   };
 
@@ -243,65 +330,129 @@ export const StoreApp: React.FC = () => {
 
   return (
     <div className="h-full bg-ph-beige overflow-y-auto">
-      {/* Header */}
-      <div className="bg-white border-b-2 border-ph-black p-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between mb-4">
-          {/* Left: Toggle Button */}
-          <button
-            onClick={() => setActiveTab(activeTab === 'ideas' ? 'products' : 'ideas')}
-            className={`px-4 py-2 font-bold border-2 border-ph-black transition-all ${
-              activeTab === 'ideas'
-                ? 'bg-ph-blue text-white shadow-retro'
-                : 'bg-ph-orange text-white shadow-retro'
-            } hover:shadow-retro hover:-translate-y-0.5`}
-          >
-            {activeTab === 'ideas' ? (
-              <>
-                <Package className="inline mr-2" size={18} />
-                View Product Shelf
-              </>
-            ) : (
-              <>
-                <Lightbulb className="inline mr-2" size={18} />
-                View Idea Vault
-              </>
-            )}
-          </button>
-
-          {/* Center: Title */}
-          <h1 className="text-2xl font-bold">
-            {activeTab === 'products' ? 'Product Shelf' : 'Idea Vault'}
-          </h1>
-
-          {/* Right: Action Button */}
-          {user ? (
+      {/* Header - Tab Navigation */}
+      <div className="bg-white border-b-2 border-ph-black sticky top-0 z-10">
+        <div className="px-8 py-4">
+          <div className="flex items-center gap-4">
             <button
-              onClick={() => activeTab === 'ideas' ? setShowIdeaForm(!showIdeaForm) : setShowProductForm(!showProductForm)}
-              className="px-4 py-2 bg-ph-green text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold"
+              onClick={() => setActiveTab('products')}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: activeTab === 'products' ? '#FF9000' : '#ffffff',
+                color: activeTab === 'products' ? '#ffffff' : '#1D1D1D',
+                border: '2px solid #1D1D1D',
+                fontWeight: 'bold',
+                boxShadow: activeTab === 'products' ? '4px 4px 0px 0px #1D1D1D' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
             >
-              <Plus className="inline mr-2" size={18} />
-              {activeTab === 'ideas' ? 'Share an Idea' : 'List a Product'}
+              Products
             </button>
-          ) : (
-            <div className="px-4 py-2 bg-gray-100 border-2 border-gray-300 font-mono text-sm text-gray-600 rounded">
-              {activeTab === 'ideas' ? '🔒 Sign in to share ideas' : '🔒 Sign in to list products'}
-            </div>
-          )}
+            <button
+              onClick={() => setActiveTab('ideas')}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: activeTab === 'ideas' ? '#3C3CFF' : '#ffffff',
+                color: activeTab === 'ideas' ? '#ffffff' : '#1D1D1D',
+                border: '2px solid #1D1D1D',
+                fontWeight: 'bold',
+                boxShadow: activeTab === 'ideas' ? '4px 4px 0px 0px #1D1D1D' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              Ideas
+            </button>
+          </div>
         </div>
-
-        {/* Subtitle / Description */}
-        <p className="text-sm font-mono text-gray-600 text-center">
-          {activeTab === 'products'
-            ? '🛍️ Browse completed products built by the community'
-            : '💡 Ideas don\'t belong to you. They belong to whoever builds them.'}
-        </p>
       </div>
 
-      <div className="p-6">
-        {/* Idea Form */}
-        {showIdeaForm && user && (
-          <div className="mb-6 bg-white border-2 border-ph-black p-6 shadow-retro">
-            <h3 className="font-bold text-lg mb-4">Share a New Idea</h3>
+      {/* Product Form Modal */}
+      {showProductForm && user && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowProductForm(false)}>
+            <div className="bg-white border-4 border-ph-black p-6 shadow-retro-lg max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-lg">Upload a Product</h3>
+                <button onClick={() => setShowProductForm(false)} className="text-2xl hover:text-ph-orange">&times;</button>
+              </div>
+              <form onSubmit={handleCreateProduct} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={newProduct.title}
+                    onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+                    required
+                    className="w-full px-3 py-2 border-2 border-ph-black font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Description</label>
+                  <textarea
+                    value={newProduct.description}
+                    onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                    required
+                    rows={4}
+                    className="w-full px-3 py-2 border-2 border-ph-black font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Build Time (days)</label>
+                  <input
+                    type="number"
+                    value={newProduct.actual_days}
+                    onChange={(e) => setNewProduct({ ...newProduct, actual_days: parseInt(e.target.value) })}
+                    min={1}
+                    required
+                    className="w-full px-3 py-2 border-2 border-ph-black font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Product URL (optional)</label>
+                  <input
+                    type="url"
+                    value={newProduct.product_url}
+                    onChange={(e) => setNewProduct({ ...newProduct, product_url: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-ph-black font-mono"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">App Path (optional)</label>
+                  <input
+                    type="text"
+                    value={newProduct.app_path}
+                    onChange={(e) => setNewProduct({ ...newProduct, app_path: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-ph-black font-mono"
+                    placeholder="/products/your-app/index.html"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={isSubmittingProduct}
+                    className="flex-1 px-4 py-2 bg-ph-orange text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmittingProduct ? 'Uploading...' : 'Upload Product'}
+                  </button>
+                  <button type="button" onClick={() => setShowProductForm(false)} className="px-4 py-2 bg-white border-2 border-ph-black font-bold hover:bg-gray-100">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+      {/* Idea Form Modal */}
+      {showIdeaForm && user && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowIdeaForm(false)}>
+          <div className="bg-white border-4 border-ph-black p-6 shadow-retro-lg max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-lg">Share a New Idea</h3>
+              <button onClick={() => setShowIdeaForm(false)} className="text-2xl hover:text-ph-orange">&times;</button>
+            </div>
             <form onSubmit={handleCreateIdea} className="space-y-4">
               <div>
                 <label className="block text-sm font-bold mb-2">Title</label>
@@ -340,229 +491,230 @@ export const StoreApp: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro font-bold"
+                  disabled={isSubmittingIdea}
+                  className="flex-1 px-4 py-2 bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Share Idea
+                  {isSubmittingIdea ? 'Sharing...' : 'Share Idea'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowIdeaForm(false)}
-                  className="px-4 py-2 bg-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro font-bold"
+                  className="px-4 py-2 bg-white border-2 border-ph-black font-bold hover:bg-gray-100"
                 >
                   Cancel
                 </button>
               </div>
             </form>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Product Form */}
-        {showProductForm && user && (
-          <div className="mb-6 bg-white border-2 border-ph-black p-6 shadow-retro">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-lg">Upload a Product</h3>
-              <button
-                type="button"
-                onClick={prefillFlowTree}
-                className="px-3 py-1 text-xs bg-ph-blue text-white border-2 border-ph-black font-mono"
-              >
-                Demo: Fill FlowTree
-              </button>
-            </div>
-            <form onSubmit={handleCreateProduct} className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold mb-2">Title</label>
-                <input
-                  type="text"
-                  value={newProduct.title}
-                  onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
-                  required
-                  className="w-full px-3 py-2 border-2 border-ph-black font-mono"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-2">Description</label>
-                <textarea
-                  value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                  required
-                  rows={4}
-                  className="w-full px-3 py-2 border-2 border-ph-black font-mono"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-2">Actual Build Time (days)</label>
-                <input
-                  type="number"
-                  value={newProduct.actual_days}
-                  onChange={(e) => setNewProduct({ ...newProduct, actual_days: parseInt(e.target.value) })}
-                  required
-                  min={1}
-                  className="w-full px-3 py-2 border-2 border-ph-black font-mono"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-2">Product URL (optional)</label>
-                <input
-                  type="url"
-                  value={newProduct.product_url}
-                  onChange={(e) => setNewProduct({ ...newProduct, product_url: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-ph-black font-mono"
-                  placeholder="https://..."
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-ph-orange text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro font-bold"
-                >
-                  Upload Product
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowProductForm(false)}
-                  className="px-4 py-2 bg-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro font-bold"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
+      <div className="p-6">
         {/* Content */}
         {activeTab === 'ideas' ? (
-          <div className="space-y-4">
+          <div>
+            {/* Page Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold">Ideas</h2>
+                <p className="text-sm text-gray-600 mt-1 font-mono">Community suggestions waiting to be built</p>
+              </div>
+              {user && (
+                <button
+                  onClick={() => setShowIdeaForm(!showIdeaForm)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#22c55e',
+                    color: '#ffffff',
+                    border: '2px solid #1D1D1D',
+                    fontWeight: 'bold',
+                    boxShadow: '2px 2px 0px 0px #1D1D1D',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  + New Idea
+                </button>
+              )}
+            </div>
+
+            {/* Table */}
             {loading ? (
-              <div className="text-center py-8 font-mono">Loading ideas...</div>
+              <div className="text-center py-12 font-mono">Loading ideas...</div>
             ) : ideas.length === 0 ? (
-              <div className="text-center py-8 bg-white border-2 border-ph-black p-6">
+              <div className="text-center py-12 bg-white border-2 border-ph-black p-6">
                 <Lightbulb size={48} className="mx-auto mb-4 text-gray-400" />
                 <p className="font-mono text-gray-600">No ideas yet. Be the first to share one!</p>
               </div>
             ) : (
-              ideas.map((idea) => (
-                <div
-                  key={idea.id}
-                  className="bg-white border-2 border-ph-black p-6 shadow-retro-sm hover:shadow-retro transition-all"
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="font-bold text-xl">{idea.title}</h3>
-                    <div className="flex gap-2 items-center text-sm font-mono">
-                      <Clock size={16} />
-                      <span>{idea.expected_days}d</span>
-                    </div>
-                  </div>
-                  <p className="text-gray-700 mb-4 font-mono text-sm">{idea.description}</p>
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-4 text-sm font-mono text-gray-600">
-                      <span className="flex items-center gap-1">
-                        <Users size={16} />
-                        {idea.claims_count} claimed
-                      </span>
-                      <span className="text-xs">by {idea.creator_email}</span>
-                    </div>
-                    {user && (
-                      <button
-                        onClick={() => handleClaimIdea(idea.id)}
-                        className="px-4 py-2 bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold text-sm"
-                      >
-                        Claim & Build
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
+              <div className="bg-white border-2 border-ph-black shadow-retro">
+                <table className="w-full">
+                  <thead className="bg-ph-beige border-b-2 border-ph-black">
+                    <tr>
+                      <th className="text-left px-6 py-3 text-xs font-bold uppercase">Idea</th>
+                      <th className="text-left px-6 py-3 text-xs font-bold uppercase">Description</th>
+                      <th className="text-center px-6 py-3 text-xs font-bold uppercase">Time</th>
+                      <th className="text-center px-6 py-3 text-xs font-bold uppercase">Claims</th>
+                      <th className="text-center px-6 py-3 text-xs font-bold uppercase">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white">
+                    {ideas.map((idea, index) => (
+                      <tr key={idea.id} className={`border-b border-gray-200 hover:bg-ph-beige/30 ${index % 2 === 0 ? '' : 'bg-gray-50'}`}>
+                        <td className="px-6 py-4">
+                          <div className="font-bold text-sm">{idea.title}</div>
+                          <div className="text-xs text-gray-500 mt-0.5 font-mono">{idea.creator_email}</div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700 max-w-md">
+                          <p className="line-clamp-2">{idea.description}</p>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="inline-block px-2 py-1 bg-ph-orange text-white font-bold text-xs border-2 border-ph-black">
+                            {idea.expected_days}d
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center text-sm font-mono">
+                          {idea.claims_count || 0}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          {user && (
+                            <button
+                              onClick={() => handleClaimIdea(idea.id)}
+                              className="px-3 py-1.5 bg-ph-blue text-white border-2 border-ph-black text-xs font-bold hover:shadow-retro-sm transition-all"
+                            >
+                              Claim
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {loading ? (
-              <div className="col-span-full text-center py-8 font-mono">Loading products...</div>
-            ) : products.length === 0 ? (
-              <div className="col-span-full text-center py-8 bg-white border-2 border-ph-black p-6">
-                <Package size={48} className="mx-auto mb-4 text-gray-400" />
-                <p className="font-mono text-gray-600">No products yet. Upload the first one!</p>
-              </div>
+          <div>
+            {/* Page Header */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold">Products</h2>
+              <p className="text-sm text-gray-600 mt-1 font-mono">Completed projects from the community</p>
+            </div>
+
+            {/* Products Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {loading ? (
+                <div className="col-span-full text-center py-12 text-gray-500">Loading products...</div>
             ) : (
-              products.map((product) => {
-                const price = calculatePrice(product.actual_days, 0); // TODO: get claims count
-                return (
+              <>
+                {/* Upload Card - First Position */}
+                {user && (
+                  <div
+                    onClick={() => setShowProductForm(!showProductForm)}
+                    className="aspect-square bg-gradient-to-br from-ph-green/10 to-ph-green/5 border-2 border-dashed border-ph-green hover:border-solid hover:shadow-retro hover:-translate-y-2 transition-all flex flex-col items-center justify-center cursor-pointer group relative"
+                  >
+                    <Plus size={48} className="text-ph-green mb-3 group-hover:scale-110 transition-transform" />
+                    <p className="font-bold text-ph-green text-sm">Upload Product</p>
+                    <p className="text-xs text-gray-500 mt-1 px-4 text-center">Share your creation</p>
+                  </div>
+                )}
+
+                {/* Product Cards */}
+                {products.map((product) => (
                   <div
                     key={product.id}
-                    className="bg-gradient-to-b from-white to-ph-beige border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-2 transition-all flex flex-col relative group"
+                    className="aspect-square bg-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-2 transition-all flex flex-col relative group overflow-hidden"
                   >
-                    {/* Book/Product Cover */}
-                    <div className="aspect-[3/4] bg-white border-b-2 border-ph-black p-4 flex flex-col items-center justify-center relative overflow-hidden">
-                      {product.image_url ? (
-                        <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="text-center">
-                          <Package size={48} className="mx-auto mb-2 text-ph-orange" />
-                          <h3 className="font-bold text-sm leading-tight px-2">{product.title}</h3>
-                        </div>
-                      )}
-
-                      {/* Hover overlay with details */}
-                      <div className="absolute inset-0 bg-ph-black/90 text-white p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between text-xs">
-                        <div>
-                          <h3 className="font-bold mb-2">{product.title}</h3>
-                          <p className="text-xs leading-tight mb-2 line-clamp-4">{product.description}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Calendar size={12} />
-                            <span>Built in {product.actual_days} days</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <ThumbsUp size={12} />
-                            <span>{product.dwfm_count} votes</span>
-                          </div>
-                          <div className="text-xs opacity-75 truncate">by {product.creator_email}</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Shelf label with price */}
-                    <div className="p-2 bg-white border-t-2 border-ph-black">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-xs truncate">{product.title}</h4>
-                          <p className="text-xs text-gray-500 font-mono truncate">{product.actual_days}d build</p>
-                        </div>
-                        {product.product_url && (
-                          <a
-                            href={product.product_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-ph-blue hover:text-ph-blue/80 ml-2"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <ExternalLink size={14} />
-                          </a>
+                    {/* Main Content - Square */}
+                    <div className="flex-1 p-4 flex flex-col items-center justify-between">
+                      {/* Icon */}
+                      <div className="flex-1 flex items-center justify-center">
+                        {product.image_url ? (
+                          <img src={product.image_url} alt={product.title} className="w-16 h-16 object-contain" />
+                        ) : product.title.includes('FlowTree') ? (
+                          <div className="text-6xl">🌳</div>
+                        ) : (
+                          <Package size={48} className="text-ph-orange" />
                         )}
                       </div>
 
-                      {/* Price tag */}
-                      <div className="bg-ph-orange text-white px-2 py-1 text-center font-bold text-sm border-2 border-ph-black mb-2">
-                        {price} pts
+                      {/* Title */}
+                      <h4 className="font-bold text-sm text-center line-clamp-2 mb-1">{product.title}</h4>
+
+                      {/* Build Time */}
+                      <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                        <span className="font-mono">{product.actual_days} days</span>
                       </div>
 
-                      {user && (
-                        <button
-                          onClick={() => handleDoesWorkForMe(product.id)}
-                          className="w-full px-2 py-1.5 bg-ph-green text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-0.5 transition-all font-bold text-xs"
-                          title="Mark this product as useful"
-                        >
-                          <ThumbsUp className="inline mr-1" size={12} />
-                          It Works
-                        </button>
-                      )}
+                      {/* Buttons - Same Row */}
+                      <div className="w-full flex gap-1">
+                        {(product.app_path || product.product_url) && (
+                          <button
+                            onClick={() => handleUseProduct(product)}
+                            className="flex-1 px-2 py-1 bg-ph-blue text-white border-2 border-ph-black font-bold text-xs hover:shadow-retro-sm transition-all"
+                          >
+                            Use
+                          </button>
+                        )}
+
+                        {user ? (
+                          <button
+                            onClick={() => handleDoesWorkForMe(product.id)}
+                            style={{
+                              flex: (product.app_path || product.product_url) ? '1' : 'auto',
+                              width: (product.app_path || product.product_url) ? 'auto' : '100%',
+                              padding: '0.25rem 0.5rem',
+                              backgroundColor: '#22c55e',
+                              color: '#ffffff',
+                              border: '2px solid #1D1D1D',
+                              fontWeight: 'bold',
+                              fontSize: '0.75rem',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            👍 {product.dwfm_count || 0}
+                          </button>
+                        ) : (
+                          <div style={{
+                            flex: (product.app_path || product.product_url) ? '1' : 'auto',
+                            width: (product.app_path || product.product_url) ? 'auto' : '100%',
+                            padding: '0.25rem 0.5rem',
+                            backgroundColor: '#ffffff',
+                            border: '2px solid #1D1D1D',
+                            color: '#000000',
+                            fontWeight: 'bold',
+                            fontSize: '0.75rem',
+                            textAlign: 'center'
+                          }}>
+                            🔒 Vote
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Hover overlay with full description */}
+                    <div className="absolute inset-0 bg-ph-black/95 text-white p-4 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-bold mb-2 text-sm">{product.title}</h3>
+                        <p className="text-xs leading-tight mb-3 line-clamp-6">{product.description}</p>
+                      </div>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex items-center gap-2">
+                          <Calendar size={12} />
+                          <span>Built in {product.actual_days} days</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <ThumbsUp size={12} />
+                          <span>{product.dwfm_count || 0} votes</span>
+                        </div>
+                        <div className="opacity-75 truncate">by {product.creator_email}</div>
+                      </div>
                     </div>
                   </div>
-                );
-              })
+                ))}
+              </>
             )}
+            </div>
           </div>
         )}
       </div>
