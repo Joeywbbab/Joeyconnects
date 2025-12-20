@@ -6,7 +6,7 @@ import { DesktopIcons } from './components/Desktop/DesktopIcons';
 import { Window } from './components/Desktop/Window';
 import { WelcomeApp } from './apps/WelcomeApp';
 import { TerminalApp } from './apps/TerminalApp';
-import { ProductOSApp } from './apps/ProductOSApp';
+import { StoreApp } from './apps/StoreApp';
 import { MemoApp } from './apps/MemoApp';
 import { WriteApp } from './apps/WriteApp';
 import { VideosApp } from './apps/VideosApp';
@@ -108,7 +108,7 @@ export default function App() {
       id: AppId.STORE,
       title: "Joey's Store",
       icon: <ShoppingBag />,
-      component: <ProductOSApp />,
+      component: <StoreApp />,
       defaultWidth: window.innerWidth - 250,
       defaultHeight: window.innerHeight - 110,
       defaultX: 110,
