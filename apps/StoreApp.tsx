@@ -262,7 +262,7 @@ export const StoreApp: React.FC = () => {
           </h1>
 
           {/* Right: Action Button */}
-          {user && (
+          {user ? (
             <button
               onClick={() => activeTab === 'ideas' ? setShowIdeaForm(!showIdeaForm) : setShowProductForm(!showProductForm)}
               className="px-4 py-2 bg-ph-green text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold"
@@ -270,6 +270,10 @@ export const StoreApp: React.FC = () => {
               <Plus className="inline mr-2" size={18} />
               {activeTab === 'ideas' ? 'Share an Idea' : 'List a Product'}
             </button>
+          ) : (
+            <div className="px-4 py-2 bg-gray-100 border-2 border-gray-300 font-mono text-sm text-gray-600 rounded">
+              {activeTab === 'ideas' ? '🔒 Sign in to share ideas' : '🔒 Sign in to list products'}
+            </div>
           )}
         </div>
 
