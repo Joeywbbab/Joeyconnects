@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { AppId, AppConfig, WindowState } from './types';
-import { Terminal, PenTool, StickyNote, Box, Video, BookOpen, Plane, GraduationCap, Layout, LogIn } from 'lucide-react';
+import { Terminal, PenTool, StickyNote, ShoppingBag, Video, BookOpen, Layout, LogIn } from 'lucide-react';
 import { MenuBar } from './components/Desktop/MenuBar';
 import { DesktopIcons } from './components/Desktop/DesktopIcons';
 import { Window } from './components/Desktop/Window';
@@ -49,16 +49,6 @@ export default function App() {
       component: <WelcomeApp />,
       defaultWidth: window.innerWidth - 220,  // 减去左右 icons 宽度
       defaultHeight: window.innerHeight - 90, // 减去顶部 navbar 和底部空间
-      defaultX: 110,
-      defaultY: 40
-    },
-    {
-      id: AppId.PRODUCT_OS,
-      title: 'Product OS',
-      icon: <Box />,
-      component: <ProductOSApp />,
-      defaultWidth: window.innerWidth - 250,
-      defaultHeight: window.innerHeight - 110,
       defaultX: 110,
       defaultY: 40
     },
@@ -115,58 +105,12 @@ export default function App() {
       defaultY: 40
     },
     {
-      id: AppId.TRAVEL,
-      title: 'Travel',
-      icon: <Plane />,
-      component: (
-        <div className="h-full bg-blue-50 p-4">
-          <h2 className="font-bold font-sans text-xl mb-4 text-ph-blue">Destinations</h2>
-          <div className="space-y-3 font-mono text-sm">
-            <div className="flex justify-between items-center bg-white p-3 border-2 border-ph-black shadow-retro-sm">
-              <span>Tokyo, JP</span>
-              <span className="bg-green-100 px-2 py-0.5 text-xs border border-green-300">Visited</span>
-            </div>
-            <div className="flex justify-between items-center bg-white p-3 border-2 border-ph-black shadow-retro-sm">
-              <span>Berlin, DE</span>
-              <span className="bg-ph-orange px-2 py-0.5 text-xs border border-orange-300">Planned</span>
-            </div>
-            <div className="flex justify-between items-center bg-white p-3 border-2 border-ph-black shadow-retro-sm">
-              <span>Reykjavik, IS</span>
-              <span className="bg-gray-100 px-2 py-0.5 text-xs border border-gray-300">Wishlist</span>
-            </div>
-          </div>
-        </div>
-      ),
-      defaultWidth: Math.min(400, window.innerWidth * 0.35),
-      defaultHeight: Math.min(550, window.innerHeight * 0.55),
-      defaultX: 100,
-      defaultY: 250
-    },
-    {
-      id: AppId.LEARN,
-      title: 'Learn',
-      icon: <GraduationCap />,
-      component: (
-        <div className="h-full bg-white p-6 font-sans">
-          <h1 className="text-3xl font-bold mb-6">Knowledge Base</h1>
-          <div className="space-y-4">
-            <div className="border-l-4 border-ph-blue pl-4 py-1">
-              <h3 className="font-bold text-lg">React Patterns</h3>
-              <p className="text-sm text-gray-600">Advanced composition and hooks.</p>
-            </div>
-            <div className="border-l-4 border-ph-orange pl-4 py-1">
-              <h3 className="font-bold text-lg">System Design</h3>
-              <p className="text-sm text-gray-600">Scalability, availability, and reliability.</p>
-            </div>
-            <div className="border-l-4 border-ph-red pl-4 py-1">
-              <h3 className="font-bold text-lg">AI Engineering</h3>
-              <p className="text-sm text-gray-600">Prompt engineering and RAG pipelines.</p>
-            </div>
-          </div>
-        </div>
-      ),
-      defaultWidth: window.innerWidth - 220,
-      defaultHeight: window.innerHeight - 90,
+      id: AppId.STORE,
+      title: "Joey's Store",
+      icon: <ShoppingBag />,
+      component: <ProductOSApp />,
+      defaultWidth: window.innerWidth - 250,
+      defaultHeight: window.innerHeight - 110,
       defaultX: 110,
       defaultY: 40
     },

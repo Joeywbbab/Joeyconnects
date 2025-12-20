@@ -2,14 +2,12 @@ import { ReactNode } from 'react';
 
 export enum AppId {
   WELCOME = 'welcome',
-  PRODUCT_OS = 'product_os',
   TERMINAL = 'terminal',
   WRITE = 'write',
   MEMO = 'memo',
   VIDEOS = 'videos',
   COMICS = 'comics',
-  TRAVEL = 'travel',
-  LEARN = 'learn',
+  STORE = 'store',
   LOGIN = 'login'
 }
 
