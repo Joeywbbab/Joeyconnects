@@ -5,6 +5,25 @@
 -- to protect your database from unauthorized access
 -- =====================================================
 
+-- 0. CREATE TABLES (if not exist)
+-- =====================================================
+
+-- Create comics table if it doesn't exist
+CREATE TABLE IF NOT EXISTS comics (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT NOT NULL,
+  image_path TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create index for better performance
+CREATE INDEX IF NOT EXISTS idx_comics_created_at ON comics(created_at DESC);
+
+-- Note: memos table should already exist from previous setup
+-- If not, you need to run the memos table creation SQL first
+
 -- 1. ENABLE RLS ON ALL TABLES
 -- =====================================================
 ALTER TABLE memos ENABLE ROW LEVEL SECURITY;
