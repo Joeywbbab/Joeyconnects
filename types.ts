@@ -9,7 +9,8 @@ export enum AppId {
   VIDEOS = 'videos',
   COMICS = 'comics',
   TRAVEL = 'travel',
-  LEARN = 'learn'
+  LEARN = 'learn',
+  LOGIN = 'login'
 }
 
 export interface AppConfig {

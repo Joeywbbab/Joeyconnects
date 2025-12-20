@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { AppId, AppConfig, WindowState } from './types';
-import { Terminal, PenTool, StickyNote, Box, Video, BookOpen, Plane, GraduationCap, Layout } from 'lucide-react';
+import { Terminal, PenTool, StickyNote, Box, Video, BookOpen, Plane, GraduationCap, Layout, LogIn } from 'lucide-react';
 import { MenuBar } from './components/Desktop/MenuBar';
 import { DesktopIcons } from './components/Desktop/DesktopIcons';
 import { Window } from './components/Desktop/Window';
@@ -11,6 +11,8 @@ import { MemoApp } from './apps/MemoApp';
 import { WriteApp } from './apps/WriteApp';
 import { VideosApp } from './apps/VideosApp';
 import { ComicsApp } from './apps/ComicsApp';
+import { LoginApp } from './apps/LoginApp';
+import { AuthProvider } from './contexts/AuthContext';
 import { AnimatePresence } from 'framer-motion';
 
 const MAX_Z_INDEX = 9999;
@@ -45,40 +47,40 @@ export default function App() {
       title: 'About',
       icon: <Layout />,
       component: <WelcomeApp />,
-      defaultWidth: 1400,
-      defaultHeight: 850,
-      defaultX: 150,
-      defaultY: 50
+      defaultWidth: window.innerWidth - 220,  // 减去左右 icons 宽度
+      defaultHeight: window.innerHeight - 90, // 减去顶部 navbar 和底部空间
+      defaultX: 110,
+      defaultY: 40
     },
     {
       id: AppId.PRODUCT_OS,
       title: 'Product OS',
       icon: <Box />,
       component: <ProductOSApp />,
-      defaultWidth: 1200,
-      defaultHeight: 700,
-      defaultX: 50,
-      defaultY: 50
+      defaultWidth: window.innerWidth - 250,
+      defaultHeight: window.innerHeight - 110,
+      defaultX: 110,
+      defaultY: 40
     },
     {
       id: AppId.TERMINAL,
       title: 'Terminal',
       icon: <Terminal />,
       component: <TerminalApp />,
-      defaultWidth: 600,
-      defaultHeight: 400,
+      defaultWidth: Math.min(700, window.innerWidth * 0.55),
+      defaultHeight: Math.min(450, window.innerHeight * 0.45),
       defaultX: 200,
-      defaultY: 250
+      defaultY: 200
     },
     {
       id: AppId.WRITE,
       title: 'Write',
       icon: <PenTool />,
       component: <WriteApp />,
-      defaultWidth: 1400,
-      defaultHeight: 850,
-      defaultX: 150,
-      defaultY: 50
+      defaultWidth: window.innerWidth - 220,
+      defaultHeight: window.innerHeight - 90,
+      defaultX: 110,
+      defaultY: 40
     },
 
     // Right Side
@@ -87,30 +89,30 @@ export default function App() {
       title: 'Memo',
       icon: <StickyNote />,
       component: <MemoApp />,
-      defaultWidth: 1400,
-      defaultHeight: 850,
-      defaultX: 150,
-      defaultY: 50
+      defaultWidth: window.innerWidth - 220,
+      defaultHeight: window.innerHeight - 90,
+      defaultX: 110,
+      defaultY: 40
     },
     {
       id: AppId.VIDEOS,
       title: 'Videos',
       icon: <Video />,
       component: <VideosApp />,
-      defaultWidth: 1200,
-      defaultHeight: 800,
-      defaultX: 400,
-      defaultY: 100
+      defaultWidth: window.innerWidth - 250,
+      defaultHeight: window.innerHeight - 110,
+      defaultX: 110,
+      defaultY: 40
     },
     {
       id: AppId.COMICS,
       title: 'Comics',
       icon: <BookOpen />,
       component: <ComicsApp />,
-      defaultWidth: 1400,
-      defaultHeight: 850,
-      defaultX: 150,
-      defaultY: 50
+      defaultWidth: window.innerWidth - 220,
+      defaultHeight: window.innerHeight - 90,
+      defaultX: 110,
+      defaultY: 40
     },
     {
       id: AppId.TRAVEL,
@@ -135,10 +137,10 @@ export default function App() {
           </div>
         </div>
       ),
-      defaultWidth: 350,
-      defaultHeight: 500,
+      defaultWidth: Math.min(400, window.innerWidth * 0.35),
+      defaultHeight: Math.min(550, window.innerHeight * 0.55),
       defaultX: 100,
-      defaultY: 300
+      defaultY: 250
     },
     {
       id: AppId.LEARN,
@@ -163,10 +165,20 @@ export default function App() {
           </div>
         </div>
       ),
-      defaultWidth: 1400,
-      defaultHeight: 850,
-      defaultX: 150,
-      defaultY: 50
+      defaultWidth: window.innerWidth - 220,
+      defaultHeight: window.innerHeight - 90,
+      defaultX: 110,
+      defaultY: 40
+    },
+    {
+      id: AppId.LOGIN,
+      title: 'Login',
+      icon: <LogIn />,
+      component: <LoginApp />,
+      defaultWidth: Math.min(500, window.innerWidth * 0.4),
+      defaultHeight: Math.min(600, window.innerHeight * 0.6),
+      defaultX: window.innerWidth / 2 - 250,
+      defaultY: window.innerHeight / 2 - 300
     }
   ], []);
 
@@ -247,32 +259,34 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative font-sans selection:bg-ph-orange selection:text-ph-black bg-ph-beige">
-      <MenuBar />
+    <AuthProvider>
+      <div className="h-screen w-screen overflow-hidden relative font-sans selection:bg-ph-orange selection:text-ph-black bg-ph-beige">
+        <MenuBar />
 
-      <DesktopIcons apps={APPS} onOpenApp={openApp} />
+        <DesktopIcons apps={APPS} onOpenApp={openApp} />
 
-      <div className="absolute inset-0 top-8 bottom-0 z-10 pointer-events-none">
-        <AnimatePresence>
-          {Object.values(windows).map((winState: WindowState) => {
-            const config = APPS.find(a => a.id === winState.id);
-            if (!config) return null;
-            return (
-              <Window
-                key={winState.id}
-                config={config}
-                state={winState}
-                onClose={() => closeWindow(winState.id)}
-                onMinimize={() => minimizeWindow(winState.id)}
-                onMaximize={() => maximizeWindow(winState.id)}
-                onFocus={() => focusWindow(winState.id)}
-                onDragEnd={() => focusWindow(winState.id)}
-                onResize={(size) => resizeWindow(winState.id, size)}
-              />
-            );
-          })}
-        </AnimatePresence>
+        <div className="absolute inset-0 top-8 bottom-0 z-10 pointer-events-none">
+          <AnimatePresence>
+            {Object.values(windows).map((winState: WindowState) => {
+              const config = APPS.find(a => a.id === winState.id);
+              if (!config) return null;
+              return (
+                <Window
+                  key={winState.id}
+                  config={config}
+                  state={winState}
+                  onClose={() => closeWindow(winState.id)}
+                  onMinimize={() => minimizeWindow(winState.id)}
+                  onMaximize={() => maximizeWindow(winState.id)}
+                  onFocus={() => focusWindow(winState.id)}
+                  onDragEnd={() => focusWindow(winState.id)}
+                  onResize={(size) => resizeWindow(winState.id, size)}
+                />
+              );
+            })}
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
+    </AuthProvider>
   );
 }

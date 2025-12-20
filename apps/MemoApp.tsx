@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase, Memo } from '../services/supabase';
-import { Image, X } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { Image, X, Lock } from 'lucide-react';
 
 // Hashtag提取函数
 function extractHashtags(text: string): string[] {
@@ -32,21 +33,24 @@ function formatDate(dateStr: string): string {
 interface MemoCardProps {
   memo: Memo;
   onDelete: (id: string) => void;
+  canDelete: boolean;
 }
 
-const MemoCard: React.FC<MemoCardProps> = ({ memo, onDelete }) => {
+const MemoCard: React.FC<MemoCardProps> = ({ memo, onDelete, canDelete }) => {
   return (
     <div className="p-4 bg-white border-2 border-ph-black shadow-retro-sm">
       <div className="flex justify-between items-start mb-2">
         <div className="text-xs text-gray-500 font-mono">
           {formatDate(memo.created_at)}
         </div>
-        <button
-          onClick={() => onDelete(memo.id)}
-          className="text-xs text-red-500 hover:underline font-mono"
-        >
-          Delete
-        </button>
+        {canDelete && (
+          <button
+            onClick={() => onDelete(memo.id)}
+            className="text-xs text-red-500 hover:underline font-mono"
+          >
+            Delete
+          </button>
+        )}
       </div>
 
       {/* Hashtags */}
@@ -81,6 +85,7 @@ const MemoCard: React.FC<MemoCardProps> = ({ memo, onDelete }) => {
 };
 
 export const MemoApp: React.FC = () => {
+  const { user, isAdmin } = useAuth();
   const [memos, setMemos] = useState<Memo[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(true);
@@ -275,7 +280,7 @@ export const MemoApp: React.FC = () => {
             <p className="text-gray-500 text-center font-mono">No memos yet. Write something!</p>
           ) : (
             memos.map((memo) => (
-              <MemoCard key={memo.id} memo={memo} onDelete={handleDelete} />
+              <MemoCard key={memo.id} memo={memo} onDelete={handleDelete} canDelete={isAdmin} />
             ))
           )}
         </div>
@@ -287,66 +292,92 @@ export const MemoApp: React.FC = () => {
         <div className="p-4 border-b-2 border-ph-black bg-white flex justify-between items-center">
           <h2 className="text-xl font-bold font-sans">New Memo</h2>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400 font-mono">⌘+Enter to post</span>
-            <button
-              onClick={handlePost}
-              disabled={uploading || !input.trim()}
-              className="px-4 py-2 bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {uploading ? 'Posting...' : 'Post'}
-            </button>
+            {isAdmin ? (
+              <>
+                <span className="text-xs text-gray-400 font-mono">⌘+Enter to post</span>
+                <button
+                  onClick={handlePost}
+                  disabled={uploading || !input.trim()}
+                  className="px-4 py-2 bg-ph-blue text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold font-sans text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? 'Posting...' : 'Post'}
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-gray-500 font-mono">
+                <Lock size={14} />
+                <span>Read-only mode</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* 编辑区内容 */}
         <div className="flex-1 p-6 overflow-y-auto">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Write something... Use #hashtags to categorize"
-            className="w-full h-40 p-4 border-2 border-ph-black rounded font-mono resize-none focus:outline-none focus:ring-2 focus:ring-ph-blue"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.metaKey) {
-                handlePost();
-              }
-            }}
-          />
-
-          {/* 图片预览 */}
-          {imagePreview && (
-            <div className="mt-4 relative inline-block">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="max-w-full max-h-64 border-2 border-ph-black rounded"
-              />
-              <button
-                onClick={clearImage}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-              >
-                <X size={16} />
-              </button>
+          {!isAdmin ? (
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center max-w-md p-8 bg-white border-2 border-ph-black shadow-retro-sm">
+                <Lock size={48} className="mx-auto mb-4 text-gray-400" />
+                <h3 className="font-bold font-sans text-lg mb-2">Viewer Mode</h3>
+                <p className="text-sm text-gray-600 font-mono mb-4">
+                  You can view all memos, but you need admin access to create, edit, or delete content.
+                </p>
+                <p className="text-xs text-gray-500 font-mono">
+                  Open the <strong>Login</strong> app to sign in as admin.
+                </p>
+              </div>
             </div>
-          )}
-
-          {/* 底部工具栏 */}
-          <div className="mt-4 flex items-center gap-4">
-            {/* 图片上传按钮 */}
-            <label className="cursor-pointer flex items-center gap-2 px-4 py-2 border-2 border-ph-black bg-white hover:bg-gray-50 shadow-retro-sm font-mono text-sm">
-              <Image size={18} />
-              <span>Add Image</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                className="hidden"
+          ) : (
+            <>
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Write something... Use #hashtags to categorize"
+                className="w-full h-40 p-4 border-2 border-ph-black rounded font-mono resize-none focus:outline-none focus:ring-2 focus:ring-ph-blue"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.metaKey) {
+                    handlePost();
+                  }
+                }}
               />
-            </label>
 
-            <span className="text-sm text-gray-500 font-mono">
-              {input.length} characters
-            </span>
-          </div>
+              {/* 图片预览 */}
+              {imagePreview && (
+                <div className="mt-4 relative inline-block">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="max-w-full max-h-64 border-2 border-ph-black rounded"
+                  />
+                  <button
+                    onClick={clearImage}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
+
+              {/* 底部工具栏 */}
+              <div className="mt-4 flex items-center gap-4">
+                {/* 图片上传按钮 */}
+                <label className="cursor-pointer flex items-center gap-2 px-4 py-2 border-2 border-ph-black bg-white hover:bg-gray-50 shadow-retro-sm font-mono text-sm">
+                  <Image size={18} />
+                  <span>Add Image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+                </label>
+
+                <span className="text-sm text-gray-500 font-mono">
+                  {input.length} characters
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
