@@ -49,8 +49,8 @@ export const LoginApp: React.FC = () => {
 
   if (user) {
     return (
-      <div className="h-full bg-white p-8 font-sans">
-        <div className="max-w-md mx-auto">
+      <div className="h-full bg-white overflow-y-auto">
+        <div className="max-w-md mx-auto p-8">
           <div className="flex items-center gap-3 mb-6">
             <User className="text-ph-blue" size={32} />
             <h1 className="text-3xl font-bold">Account</h1>
@@ -90,8 +90,8 @@ export const LoginApp: React.FC = () => {
   }
 
   return (
-    <div className="h-full bg-white p-8 font-sans">
-      <div className="max-w-md mx-auto">
+    <div className="h-full bg-white overflow-y-auto">
+      <div className="max-w-md mx-auto p-8 pb-16">
         <div className="flex items-center gap-3 mb-6">
           <LogIn className="text-ph-blue" size={32} />
           <h1 className="text-3xl font-bold">Sign In</h1>
