@@ -26,6 +26,13 @@ interface Product {
   idea_id?: string;
 }
 
+// Calculate product price based on actual days and claims
+const calculatePrice = (actualDays: number, claimsCount: number = 0): number => {
+  const basePrice = actualDays * 10; // 10 points per day
+  const supplyDiscount = claimsCount > 1 ? 0.9 : 1; // 10% off if multiple people built it
+  return Math.round(basePrice * supplyDiscount);
+};
+
 type Tab = 'ideas' | 'products';
 
 export const StoreApp: React.FC = () => {
@@ -227,17 +234,26 @@ export const StoreApp: React.FC = () => {
       {/* Header */}
       <div className="bg-white border-b-2 border-ph-black p-4 sticky top-0 z-10">
         <div className="flex items-center justify-between mb-4">
-          {/* Left: Idea Vault Button */}
+          {/* Left: Toggle Button */}
           <button
-            onClick={() => setActiveTab('ideas')}
+            onClick={() => setActiveTab(activeTab === 'ideas' ? 'products' : 'ideas')}
             className={`px-4 py-2 font-bold border-2 border-ph-black transition-all ${
               activeTab === 'ideas'
                 ? 'bg-ph-blue text-white shadow-retro'
-                : 'bg-white hover:shadow-retro-sm'
-            }`}
+                : 'bg-ph-orange text-white shadow-retro'
+            } hover:shadow-retro hover:-translate-y-0.5`}
           >
-            <Lightbulb className="inline mr-2" size={18} />
-            Idea Vault
+            {activeTab === 'ideas' ? (
+              <>
+                <Package className="inline mr-2" size={18} />
+                View Product Shelf
+              </>
+            ) : (
+              <>
+                <Lightbulb className="inline mr-2" size={18} />
+                View Idea Vault
+              </>
+            )}
           </button>
 
           {/* Center: Title */}
@@ -435,7 +451,7 @@ export const StoreApp: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {loading ? (
               <div className="col-span-full text-center py-8 font-mono">Loading products...</div>
             ) : products.length === 0 ? (
@@ -444,52 +460,83 @@ export const StoreApp: React.FC = () => {
                 <p className="font-mono text-gray-600">No products yet. Upload the first one!</p>
               </div>
             ) : (
-              products.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white border-2 border-ph-black p-4 shadow-retro-sm hover:shadow-retro transition-all flex flex-col"
-                >
-                  {/* Product Card - like items on a shelf */}
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-lg">{product.title}</h3>
-                      {product.product_url && (
-                        <a
-                          href={product.product_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-ph-blue hover:text-ph-blue/80"
+              products.map((product) => {
+                const price = calculatePrice(product.actual_days, 0); // TODO: get claims count
+                return (
+                  <div
+                    key={product.id}
+                    className="bg-gradient-to-b from-white to-ph-beige border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-2 transition-all flex flex-col relative group"
+                  >
+                    {/* Book/Product Cover */}
+                    <div className="aspect-[3/4] bg-white border-b-2 border-ph-black p-4 flex flex-col items-center justify-center relative overflow-hidden">
+                      {product.image_url ? (
+                        <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center">
+                          <Package size={48} className="mx-auto mb-2 text-ph-orange" />
+                          <h3 className="font-bold text-sm leading-tight px-2">{product.title}</h3>
+                        </div>
+                      )}
+
+                      {/* Hover overlay with details */}
+                      <div className="absolute inset-0 bg-ph-black/90 text-white p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between text-xs">
+                        <div>
+                          <h3 className="font-bold mb-2">{product.title}</h3>
+                          <p className="text-xs leading-tight mb-2 line-clamp-4">{product.description}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Calendar size={12} />
+                            <span>Built in {product.actual_days} days</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <ThumbsUp size={12} />
+                            <span>{product.dwfm_count} votes</span>
+                          </div>
+                          <div className="text-xs opacity-75 truncate">by {product.creator_email}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Shelf label with price */}
+                    <div className="p-2 bg-white border-t-2 border-ph-black">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-xs truncate">{product.title}</h4>
+                          <p className="text-xs text-gray-500 font-mono truncate">{product.actual_days}d build</p>
+                        </div>
+                        {product.product_url && (
+                          <a
+                            href={product.product_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-ph-blue hover:text-ph-blue/80 ml-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ExternalLink size={14} />
+                          </a>
+                        )}
+                      </div>
+
+                      {/* Price tag */}
+                      <div className="bg-ph-orange text-white px-2 py-1 text-center font-bold text-sm border-2 border-ph-black mb-2">
+                        {price} pts
+                      </div>
+
+                      {user && (
+                        <button
+                          onClick={() => handleDoesWorkForMe(product.id)}
+                          className="w-full px-2 py-1.5 bg-ph-green text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-0.5 transition-all font-bold text-xs"
+                          title="Mark this product as useful"
                         >
-                          <ExternalLink size={18} />
-                        </a>
+                          <ThumbsUp className="inline mr-1" size={12} />
+                          It Works
+                        </button>
                       )}
                     </div>
-                    <p className="text-sm text-gray-700 mb-3 font-mono">{product.description}</p>
-                    <div className="flex gap-3 text-xs font-mono text-gray-600 mb-3">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {product.actual_days}d
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <ThumbsUp size={14} />
-                        {product.dwfm_count}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 font-mono mb-3">by {product.creator_email}</p>
                   </div>
-
-                  {user && (
-                    <button
-                      onClick={() => handleDoesWorkForMe(product.id)}
-                      className="w-full px-3 py-2 bg-ph-green text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold text-sm"
-                      title="Mark this product as useful"
-                    >
-                      <ThumbsUp className="inline mr-1" size={14} />
-                      It Works For Me
-                    </button>
-                  )}
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         )}
