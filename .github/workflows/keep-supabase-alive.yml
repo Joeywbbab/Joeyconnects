@@ -1,0 +1,38 @@
+name: Keep Supabase Active
+
+on:
+  schedule:
+    # 每天 UTC 时间 00:00 运行（北京时间 08:00）
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          echo "Pinging Supabase to keep project active..."
+
+          # 执行一个简单的查询来保持数据库活跃
+          response=$(curl -s -w "\n%{http_code}" -X GET \
+            "$SUPABASE_URL/rest/v1/memos?select=count&limit=1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY")
+
+          http_code=$(echo "$response" | tail -n1)
+
+          if [ "$http_code" -eq 200 ] || [ "$http_code" -eq 206 ]; then
+            echo "✅ Successfully pinged Supabase (HTTP $http_code)"
+          else
+            echo "❌ Failed to ping Supabase (HTTP $http_code)"
+            exit 1
+          fi
+
+      - name: Log Activity
+        run: |
+          echo "Keep-alive ping completed at $(date)"
+          echo "Next scheduled run: tomorrow at the same time"
