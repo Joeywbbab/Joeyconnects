@@ -30,7 +30,7 @@ type Tab = 'ideas' | 'products';
 
 export const StoreApp: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<Tab>('ideas');
+  const [activeTab, setActiveTab] = useState<Tab>('products');
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -226,10 +226,8 @@ export const StoreApp: React.FC = () => {
     <div className="h-full bg-ph-beige overflow-y-auto">
       {/* Header */}
       <div className="bg-white border-b-2 border-ph-black p-4 sticky top-0 z-10">
-        <h1 className="text-2xl font-bold mb-4">Idea & Product Store</h1>
-
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex items-center justify-between mb-4">
+          {/* Left: Idea Vault Button */}
           <button
             onClick={() => setActiveTab('ideas')}
             className={`px-4 py-2 font-bold border-2 border-ph-black transition-all ${
@@ -241,29 +239,30 @@ export const StoreApp: React.FC = () => {
             <Lightbulb className="inline mr-2" size={18} />
             Idea Vault
           </button>
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`px-4 py-2 font-bold border-2 border-ph-black transition-all ${
-              activeTab === 'products'
-                ? 'bg-ph-orange text-white shadow-retro'
-                : 'bg-white hover:shadow-retro-sm'
-            }`}
-          >
-            <Package className="inline mr-2" size={18} />
-            Product Shelf
-          </button>
+
+          {/* Center: Title */}
+          <h1 className="text-2xl font-bold">
+            {activeTab === 'products' ? 'Product Shelf' : 'Idea Vault'}
+          </h1>
+
+          {/* Right: Action Button */}
+          {user && (
+            <button
+              onClick={() => activeTab === 'ideas' ? setShowIdeaForm(!showIdeaForm) : setShowProductForm(!showProductForm)}
+              className="px-4 py-2 bg-ph-green text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold"
+            >
+              <Plus className="inline mr-2" size={18} />
+              {activeTab === 'ideas' ? 'Share an Idea' : 'List a Product'}
+            </button>
+          )}
         </div>
 
-        {/* Add New Button */}
-        {user && (
-          <button
-            onClick={() => activeTab === 'ideas' ? setShowIdeaForm(!showIdeaForm) : setShowProductForm(!showProductForm)}
-            className="w-full px-4 py-2 bg-ph-green text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold"
-          >
-            <Plus className="inline mr-2" size={18} />
-            {activeTab === 'ideas' ? 'Share New Idea' : 'Upload Product'}
-          </button>
-        )}
+        {/* Subtitle / Description */}
+        <p className="text-sm font-mono text-gray-600 text-center">
+          {activeTab === 'products'
+            ? '🛍️ Browse completed products built by the community'
+            : '💡 Ideas don\'t belong to you. They belong to whoever builds them.'}
+        </p>
       </div>
 
       <div className="p-6">
@@ -393,9 +392,6 @@ export const StoreApp: React.FC = () => {
         {/* Content */}
         {activeTab === 'ideas' ? (
           <div className="space-y-4">
-            <p className="text-sm font-mono text-gray-600 mb-4">
-              💡 Ideas don't belong to you. They belong to whoever builds them.
-            </p>
             {loading ? (
               <div className="text-center py-8 font-mono">Loading ideas...</div>
             ) : ideas.length === 0 ? (
@@ -486,9 +482,10 @@ export const StoreApp: React.FC = () => {
                     <button
                       onClick={() => handleDoesWorkForMe(product.id)}
                       className="w-full px-3 py-2 bg-ph-green text-white border-2 border-ph-black shadow-retro-sm hover:shadow-retro hover:-translate-y-1 transition-all font-bold text-sm"
+                      title="Mark this product as useful"
                     >
                       <ThumbsUp className="inline mr-1" size={14} />
-                      Does Work For Me
+                      It Works For Me
                     </button>
                   )}
                 </div>
