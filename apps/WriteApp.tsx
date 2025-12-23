@@ -308,6 +308,16 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
               ul: ({node, ...props}) => <ul className="my-6 list-disc list-inside" {...props} />,
               ol: ({node, ...props}) => <ol className="my-6 list-decimal list-inside" {...props} />,
               li: ({node, ...props}) => <li className="text-gray-700 leading-relaxed mb-2" {...props} />,
+              table: ({node, ...props}) => (
+                <div className="my-8 overflow-x-auto">
+                  <table className="min-w-full border-2 border-ph-black bg-white" {...props} />
+                </div>
+              ),
+              thead: ({node, ...props}) => <thead className="bg-gray-100 border-b-2 border-ph-black" {...props} />,
+              tbody: ({node, ...props}) => <tbody {...props} />,
+              tr: ({node, ...props}) => <tr className="border-b border-gray-300 hover:bg-gray-50 transition-colors" {...props} />,
+              th: ({node, ...props}) => <th className="px-4 py-3 text-left text-sm font-bold font-sans border-r-2 border-gray-300 last:border-r-0" {...props} />,
+              td: ({node, ...props}) => <td className="px-4 py-3 text-sm text-gray-700 border-r border-gray-200 last:border-r-0" {...props} />,
             }}
           >
             {post.content}
