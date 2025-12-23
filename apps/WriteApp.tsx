@@ -305,9 +305,14 @@ const PostDetailView: React.FC<PostDetailViewProps> = ({ post, allPosts, onSelec
               h6: ({node, ...props}) => <h6 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="font-sans font-bold text-sm mt-4 mb-2" {...props} />,
               p: ({node, ...props}) => <p className="text-gray-700 leading-relaxed mb-6" {...props} />,
               strong: ({node, ...props}) => <strong className="text-gray-900 font-bold" {...props} />,
-              ul: ({node, ...props}) => <ul className="my-6 list-disc list-inside" {...props} />,
-              ol: ({node, ...props}) => <ol className="my-6 list-decimal list-inside" {...props} />,
-              li: ({node, ...props}) => <li className="text-gray-700 leading-relaxed mb-2" {...props} />,
+              blockquote: ({node, ...props}) => (
+                <blockquote className="my-6 pl-4 border-l-4 border-ph-blue bg-gray-50 py-3 pr-4 italic text-gray-700" {...props} />
+              ),
+              ul: ({node, ...props}) => <ul className="my-6 space-y-2 list-disc pl-6 marker:text-gray-400" {...props} />,
+              ol: ({node, ...props}) => <ol className="my-6 space-y-2 list-decimal pl-6 marker:text-gray-600" {...props} />,
+              li: ({node, ...props}) => (
+                <li className="text-gray-700 leading-relaxed pl-2" {...props} />
+              ),
               table: ({node, ...props}) => (
                 <div className="my-8 overflow-x-auto">
                   <table className="min-w-full border-2 border-ph-black bg-white" {...props} />

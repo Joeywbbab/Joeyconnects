@@ -38,7 +38,7 @@ GEO targets the **long-tail, conversational queries** that users naturally ask A
 - **SaaS companies** (their products are frequently queried in AI conversations)
 - **E-commerce brands** (consumer goods and product comparisons are AI's sweet spot)
 
-> 💡 **Reality check:** GEO isn't killing SEO. It builds *on top of* solid SEO foundations. Think of it as SEO 2.0, not a replacement.
+> **Reality check:** GEO isn't killing SEO. It builds *on top of* solid SEO foundations. Think of it as SEO 2.0, not a replacement.
 
 ---
 
@@ -84,7 +84,7 @@ Prompts are to GEO what keywords are to SEO — but richer.
 
 ### Factor 2: Testing & Monitoring (The Black Box Challenge)
 
-> ⚠️ **Hard truth:** LLMs are black boxes. You cannot control them like a Google algorithm update.
+> **Hard truth:** LLMs are black boxes. You cannot control them like a Google algorithm update.
 
 **What you can do:**
 
@@ -133,10 +133,10 @@ Not all topics are equal. Here's how to identify where to focus:
 
 | Your Brand | Competitor | Situation | Action |
 |------------|------------|-----------|--------|
-| ✅ Mentioned | ❌ Not mentioned | **You're winning** | Maintain: refresh data, reinforce authority |
-| ❌ Not mentioned | ✅ Mentioned | **You're losing** | Create: produce content from new angles |
-| ✅ Mentioned | ✅ Mentioned | **Competitive** | Analyze: check sentiment, position, depth |
-| ❌ Not mentioned | ❌ Not mentioned | **White space** | Opportunity: be the first to own this topic |
+| Mentioned | Not mentioned | **You're winning** | Maintain: refresh data, reinforce authority |
+| Not mentioned | Mentioned | **You're losing** | Create: produce content from new angles |
+| Mentioned | Mentioned | **Competitive** | Analyze: check sentiment, position, depth |
+| Not mentioned | Not mentioned | **White space** | Opportunity: be the first to own this topic |
 
 ### Real Example: Manus AI Agent
 
@@ -179,7 +179,7 @@ Start with these foundational actions:
 
 ### The Attribution Challenge
 
-> ⚠️ **Reality:** GEO attribution is still a black box. There's no "Google Analytics for AI mentions" yet.
+> **Reality:** GEO attribution is still a black box. There's no "Google Analytics for AI mentions" yet.
 
 But here's what we *can* measure:
 
@@ -213,7 +213,7 @@ Some AI platforms (like Perplexity) do send identifiable referral traffic. Check
 - `perplexity.ai` referrals
 - Unusual spikes in direct traffic (may indicate AI-driven brand discovery)
 
-> ⚠️ **Caveat:** The referral tracking system isn't fully transparent, and many AI-driven visits may appear as "direct" traffic.
+> **Caveat:** The referral tracking system isn't fully transparent, and many AI-driven visits may appear as "direct" traffic.
 
 **3. Brand Search Correlation**
 
