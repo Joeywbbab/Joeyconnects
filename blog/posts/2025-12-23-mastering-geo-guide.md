@@ -1,252 +1,205 @@
 ---
-title: Mastering GEO - A Practical Guide to Generative Engine Optimization
+title: GEO is SEO for AI Answers (and it's not optional anymore)
 date: 2025-12-23
 tags: [seo, ai, marketing, optimization]
 category: newsletter
-excerpt: Your brand isn't just competing for Google rankings anymore — it's competing for a seat at the AI's table. A comprehensive guide to optimizing for LLMs in the AI era.
+excerpt: If you do marketing long enough, you eventually learn a depressing truth - you don't control the distribution. In the LLM era, if your brand isn't inside that AI-generated paragraph, you can be the best product in the world and still lose.
 ---
 
-> Your brand isn't just competing for Google rankings anymore — it's competing for a seat at the AI's table.
+If you do marketing long enough, you eventually learn a depressing truth: you don't control the distribution.
+
+In the Google era, the distribution was a list of blue links. In the LLM era, the distribution is a paragraph that sounds confident.
+And if your brand isn't inside that paragraph, you can be the best product in the world and still lose.
+
+That is what people mean by **GEO — Generative Engine Optimization**.
 
 ---
 
-## What is GEO?
+## 1) What is GEO?
 
-**GEO (Generative Engine Optimization)** is the next evolution of SEO in the AI era.
+**SEO** is about ranking on the search engine results page.
+
+**GEO** is about being **mentioned** (and ideally **cited**) inside an AI-generated answer.
+
+Same intent. Different surface area.
 
 | Aspect | SEO | GEO |
-|--------|-----|-----|
-| **Goal** | Rank high on Google's SERP | Get mentioned & cited in LLM answers |
-| **Controller** | Google Search Algorithm | LLMs (ChatGPT, Gemini, Perplexity, etc.) |
-| **Core Factor** | Keywords | Prompts |
-| **Output** | List of links | Synthesized answers with citations |
+|---|---|---|
+| Output | Links | Synthesized answer (sometimes with citations) |
+| Primary object | Keyword | Prompt (a question) |
+| Winning signal | Ranking | Mention, position in answer, citation rate |
+| Controller | Search algorithm | LLM behavior (mostly a black box) |
 
-### A Concrete Example
+### A concrete example
 
-Imagine a user asks ChatGPT: *"What's the best project management tool for startups?"*
+User asks: **"What's the best project management tool for startups?"**
 
-- **In traditional SEO:** You optimize for this keyword to rank on Google's first page.
-- **In GEO:** You optimize your content so that ChatGPT *mentions your brand* in its answer — or better, *cites your website* as the source.
+- In SEO: you try to rank for this (or a close variant).
+- In GEO: you try to be the tool the model *names*, and the page it *cites*.
 
-GEO targets the **long-tail, conversational queries** that users naturally ask AI assistants. These are often more specific and intent-rich than typical Google searches.
+The important detail: LLM queries tend to be **long-tail and conversational**. They read like what a person would say out loud. That changes how you discover demand, and how you write.
 
-### Should You Care About GEO?
+### Who should care?
 
-**The honest answer:** GEO requires investment — both time and resources. It's most relevant for:
+If you're tiny, GEO might be a distraction. If you're medium-sized and you already invest in content and SEO, GEO is the next obvious frontier.
 
-- **Medium to large-scale companies** with capacity to experiment
-- **SaaS companies** (their products are frequently queried in AI conversations)
-- **E-commerce brands** (consumer goods and product comparisons are AI's sweet spot)
+In practice, the biggest near-term beneficiaries are:
 
-> **Reality check:** GEO isn't killing SEO. It builds *on top of* solid SEO foundations. Think of it as SEO 2.0, not a replacement.
+- SaaS (people ask AI which tool to buy)
+- E-commerce / consumer products (people ask AI what to choose)
 
----
-
-## Key Factors of GEO
-
-### The Hierarchy: Prompts → Answers → Citations
-
-Before diving in, let's clarify two dimensions of GEO:
-
-| Dimension | Elements | Focus |
-|-----------|----------|-------|
-| **GEO Performance** | Prompts, Answers, Citations | What you're measuring |
-| **AI-Friendliness** | Content structure, Schema, Domain authority | What you're optimizing |
-
-**GEO success = Strong SEO foundation + AI-optimized content preferences**
+And no, GEO doesn't "kill" SEO. GEO is built on top of SEO. If your SEO foundation is weak, GEO is mostly wishful thinking.
 
 ---
 
-### Factor 1: Prompt Research (The Most Critical)
+## 2) The real mechanics: Prompts → Answers → Citations
 
-Prompts are to GEO what keywords are to SEO — but richer.
+When people discuss GEO, they often mix two different dimensions:
 
-**Why prompts matter:**
-1. They reveal your users' *real problems* and your brand's current positioning
-2. They directly shape the AI's answers (even though answers remain a black box)
-3. They expose which domains AI considers authoritative for specific topics
+1. **Performance dimension**: prompts, answers, citations (what you measure)
+2. **AI-friendliness dimension**: structure, schema, authority, freshness (what you improve)
 
-**How to research prompts:**
+Most confusion comes from treating these as one bucket. They're not.
 
-| Source | What to Extract |
-|--------|-----------------|
-| **Your brand website** | FAQ patterns, common user questions |
-| **Industry forums & communities** | Pain points, comparison queries |
-| **Competitor analysis** | What problems do users associate with competitors? |
-| **Customer support tickets** | Real language users use to describe problems |
+Here's a useful mental model:
 
-**Prompt design angles:**
-- Brand reputation prompts: *"Is [Brand] reliable?"*
-- Product feature prompts: *"What's the best tool for [specific use case]?"*
-- Comparison prompts: *"[Brand A] vs [Brand B] for [use case]"*
+> **GEO success = SEO fundamentals + content that LLMs can reliably extract and cite**
 
 ---
 
-### Factor 2: Testing & Monitoring (The Black Box Challenge)
+## 3) Prompts are the new keywords (but they're richer)
 
-> **Hard truth:** LLMs are black boxes. You cannot control them like a Google algorithm update.
+If you remember nothing else, remember this:
 
-**What you can do:**
+> In GEO, **prompts** play the role keywords played in SEO — but they encode more context and intent.
 
-1. **Script-based prompt testing**
-   - Run systematic tests with prompt variations
-   - Document which prompts surface your brand vs. competitors
-   - Track changes over time
+Why prompts matter:
 
-2. **Monitor AI mentions**
-   - Use tools or manual testing to track brand visibility
-   - Check citation patterns — is your content being referenced?
+- They mirror the user's actual problem (and the brand's position in that problem space)
+- They decide what the model "thinks" the question is
+- They reveal which domains the model treats as authoritative
 
-3. **Analyze response patterns**
-   - Note the structure of answers where you appear
-   - Identify what types of content get cited
+### How to find good prompts (practical)
 
----
+Don't start by brainstorming "creative prompts." Start by collecting the language users already use.
 
-### Factor 3: AI-Friendly Content Structure
+Good sources:
 
-To be picked up by LLMs, your content needs to be *parseable* and *authoritative*.
+- Your own website: FAQ, help center, product pages ("what is X?", "how does X work?")
+- Industry communities: Reddit, forums, Discords ("what do people argue about?")
+- Customer support: the raw phrasing people use when they're confused
+- Competitors: the categories they own and the claims they repeat
 
-**Structural optimizations:**
+Three prompt angles that usually work:
 
-| Element | Why It Matters |
-|---------|----------------|
-| **Clear headings (H2, H3)** | LLMs use hierarchy to understand content |
-| **FAQ sections** | Directly matches question-answer prompts |
-| **Bullet points & lists** | Easier for AI to extract and cite |
-| **Concise definitions** | AI loves clear, quotable statements |
-| **Schema markup** | Helps AI crawlers interpret content structure |
-
-**Content preferences for LLMs:**
-- Question-answer format
-- Definitive statements (avoid hedging when possible)
-- Fresh, updated information with clear dates
-- Credible citations and references within your content
+- **Reputation**: "Is [Brand] reliable? Is it safe? Is it worth it?"
+- **Feature**: "Best tool for [use case]? Can [tool] do [specific thing]?"
+- **Comparison**: "[Brand A] vs [Brand B] for [use case]"
 
 ---
 
-## What Defines a GEO Opportunity?
+## 4) The black box: how to test without pretending it's science
 
-Not all topics are equal. Here's how to identify where to focus:
+LLMs are black boxes. You won't get clean causal results.
+But you can still run useful experiments.
 
-### The Competitive Matrix
+What to do:
 
-| Your Brand | Competitor | Situation | Action |
-|------------|------------|-----------|--------|
-| Mentioned | Not mentioned | **You're winning** | Maintain: refresh data, reinforce authority |
-| Not mentioned | Mentioned | **You're losing** | Create: produce content from new angles |
-| Mentioned | Mentioned | **Competitive** | Analyze: check sentiment, position, depth |
-| Not mentioned | Not mentioned | **White space** | Opportunity: be the first to own this topic |
+- Write scripts (or use tools) to run a stable prompt set repeatedly
+- Track changes over time (mentions, position, citations)
+- Vary one thing at a time when you can: prompt phrasing, page, structure, claim
 
-### Real Example: Manus AI Agent
+What not to do:
 
-**Context:** Manus is an AI agent that wants to expand into the AI presentation market.
-
-**Problem diagnosed:** Testing prompts about "AI presentation tools" revealed Manus was *rarely mentioned* — strong competitors dominated the answers.
-
-**GEO strategy:**
-1. Create content explicitly connecting Manus's AI agent capabilities to presentation creation
-2. Target pain points: *"AI that creates professional presentations for office workers"*
-3. Study what competitors are doing right — what content gets them cited?
-4. Build topic clusters around: Manus + presentations + specific use cases
-
-**Key insight:** Prompt testing doesn't just reveal your weaknesses — it maps your competitors' content strategies.
+- Don't treat one response as truth.
+- Don't optimize for a single model's quirks and call it a strategy.
 
 ---
 
-### Low-Hanging Fruit for Beginners
+## 5) Make your site "AI-readable"
 
-Start with these foundational actions:
+Even though prompts drive the conversation, **content structure** determines whether you're extractable.
 
-**1. Technical SEO audit**
-- Clean schema markup (helps AI crawlers understand your site)
-- Optimized robots.txt (don't accidentally block AI crawlers)
-- Fast, crawlable site architecture
+If a model can't easily locate the answer on your page, it can't confidently cite it.
 
-**2. Content structure review**
-- Add FAQ sections to key pages
-- Use question-based headings
-- Create clear, citable definitions
+Basic structural wins:
 
-**3. Brand identity consistency**
-- Ensure your brand name + value proposition appears consistently
-- Build topic clusters that reinforce what your brand is *about*
-- Think of your website as a book — every chapter should strengthen the same narrative
+- Clear headings (H1/H2 with meaningful labels)
+- FAQ sections where they actually make sense
+- Lists and short, direct definitions
+- Updated timestamps when freshness matters
+- Schema markup where appropriate
+
+This is the part where GEO looks suspiciously like "good SEO + good writing." That's because it is.
 
 ---
 
-## How to Make Attribution Analysis
+## 6) Finding GEO opportunities: treat it like a competitive map
 
-### The Attribution Challenge
+Opportunities are easiest to define relative to competitors.
 
-> **Reality:** GEO attribution is still a black box. There's no "Google Analytics for AI mentions" yet.
+| You | Competitor | What it means | What to do |
+|---|---|---|---|
+| Mentioned | Not mentioned | You're winning | Maintain: refresh, deepen authority |
+| Not mentioned | Mentioned | You're losing | Create: new angles, stronger pages |
+| Mentioned | Mentioned | Competitive | Analyze: sentiment, position, depth |
+| Not mentioned | Not mentioned | White space | Move first: claim the topic |
 
-But here's what we *can* measure:
+### Example: Manus and "AI presentations"
 
-### Key Metrics
+Suppose Manus is an AI agent expanding into "AI presentation tools," but prompt testing shows Manus is rarely mentioned.
 
-| Metric | What It Tells You | How to Track |
-|--------|-------------------|--------------|
-| **Visibility & Mentions** | Is your brand appearing in AI answers? | Prompt testing |
-| **Visibility Trend** | Is your presence growing or shrinking? | Regular testing over time |
-| **Position Score** | Where do you appear in the answer? (First? Last?) | Manual analysis |
-| **Citation Rate** | Is AI linking to your content? | Check for your URLs in responses |
-| **Sentiment** | How positively is your brand framed? | Qualitative analysis |
+This tells you two things:
 
-### Current Attribution Methods
+1. The market exists (otherwise competitors wouldn't show up consistently).
+2. Your positioning isn't legible to the model yet.
 
-**1. Prompt Testing Framework**
+A reasonable plan:
+
+- Create pages that explicitly link "AI agent" → "creates presentations"
+- Target office-worker pain: speed, templates, polish, story structure
+- Build topic clusters: Manus + presentation + use case + outcomes
+- Study what competitors get cited for, and cover the missing pieces
+
+Prompt testing doesn't just diagnose your weakness. It tells you who the model thinks is the authority — which is basically competitor research with less pretending.
+
+---
+
+## 7) Attribution: the best imperfect system we have
+
+Attribution in GEO is messy because the system is opaque.
+So you measure what you can observe directly.
+
+What usually matters:
+
+- **Mentions**: do you appear at all?
+- **Position**: are you first, mid-pack, or a footnote?
+- **Citations**: does the model link to your site?
+- **Sentiment**: is the mention positive, neutral, or cautious?
+
+### A simple prompt-testing loop
 
 ```
-Step 1: Define relevant keywords/topics for your brand
-Step 2: Craft prompts around these topics
-Step 3: Test prompts across LLMs (ChatGPT, Gemini, Perplexity)
-Step 4: Document: Are you mentioned? Cited? What position?
-Step 5: Create/update content based on gaps
-Step 6: Re-test after 2-4 weeks
+1) Pick a topic set (your key use cases)
+2) Write prompt variants (reputation / feature / comparison)
+3) Test across models (ChatGPT, Gemini, Perplexity)
+4) Record: mention? position? citation? sentiment?
+5) Ship content improvements
+6) Re-test in 2–4 weeks
 ```
 
-**2. Referral Traffic Monitoring**
+### Referral traffic (when you can get it)
 
-Some AI platforms (like Perplexity) do send identifiable referral traffic. Check your analytics for:
-- `chat.openai.com` referrals
-- `perplexity.ai` referrals
-- Unusual spikes in direct traffic (may indicate AI-driven brand discovery)
+Some platforms send identifiable referrals (e.g. Perplexity). Many don't, or show up as "direct."
+So treat referral data as a helpful signal, not as a full measurement system.
 
-> **Caveat:** The referral tracking system isn't fully transparent, and many AI-driven visits may appear as "direct" traffic.
-
-**3. Brand Search Correlation**
-
-Monitor branded search trends. If GEO is working:
-- Brand searches may increase
-- Long-tail brand + use case searches may emerge
-- This indicates people are discovering your brand through AI and then searching for more
+Also watch **branded search**. If GEO works, people often discover you in AI, then search your name to verify.
 
 ---
 
-## Summary: The GEO Playbook
+## Closing
 
-| Phase | Focus | Actions |
-|-------|-------|---------|
-| **Foundation** | Technical SEO + AI-friendliness | Schema, structure, FAQs |
-| **Research** | Prompt discovery | Test, analyze competitors, find gaps |
-| **Optimization** | Content creation | Fill gaps, build topic authority |
-| **Measurement** | Attribution | Track mentions, citations, trends |
-| **Iteration** | Continuous improvement | Re-test, update, expand |
+GEO isn't magic. It's not even new in spirit.
+It's the same old game: understand the question, publish the best answer, earn trust.
 
----
-
-## Final Thoughts
-
-GEO isn't a magic switch — it's a discipline. The brands that win will be those who:
-
-1. **Treat prompts as seriously as keywords**
-2. **Build content that AI *wants* to cite**
-3. **Accept the black box** and optimize based on observable patterns
-4. **Layer GEO on top of strong SEO** — not instead of it
-
-The AI era isn't replacing search. It's expanding it. Your job is to show up in both worlds.
-
----
-
-*Have questions about GEO? The irony is: ask an AI. See who shows up in the answer — that's your competition.*
+The only difference is where the answer shows up.
