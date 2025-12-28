@@ -9,6 +9,10 @@ export const metadata: Metadata = {
     default: 'Joey — Problem-Solving Architect',
     template: '%s | Joey Connects',
   },
+  icons: {
+    icon: '/icon.svg',
+    apple: '/icon.svg',
+  },
   description: "I find problems. I build solutions. Product architect who builds products, writes about ideas, and believes every problem has a solution.",
   keywords: ['Joey', 'Product Development', 'GEO', 'AI Search Optimization', 'AEO', 'Product Architect'],
   authors: [{ name: 'Joey' }],
