@@ -1,79 +1,27 @@
 import Link from 'next/link';
 import { getAllNotes } from '@/lib/content';
 import type { Metadata } from 'next';
+import ScrapbookContent from '@/components/ScrapbookContent';
 
 export const metadata: Metadata = {
   title: 'Scrapbook',
   description: 'Unrefined ideas, snippets, and findings.',
 };
 
-const noteColors = [
-  'bg-white',
-  'bg-[#fff9e6]',
-  'bg-[#f0f9ff]',
-  'bg-[#fef2f2]',
-  'bg-[#f0fdf4]',
-];
-
-const rotations = [
-  '-rotate-1',
-  'rotate-2',
-  '-rotate-2',
-  'rotate-1',
-  '-rotate-1',
-];
-
 export default async function NotesPage() {
   const notes = await getAllNotes();
 
   return (
-    <div className="container-medium py-12">
-      {/* Header */}
-      <div className="mb-12">
-        <h1 className="section-title">Digital Scratchpad.</h1>
-        <p className="section-subtitle">Unrefined ideas, snippets, and findings.</p>
-      </div>
-
-      {/* Notes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {notes.map((note, idx) => (
-          <Link
-            key={note.slug}
-            href={`/notes/${note.slug}`}
-            className={`card-note ${noteColors[idx % noteColors.length]} ${rotations[idx % rotations.length]} hover:rotate-0`}
-          >
-            {/* Number Badge */}
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 ${
-              idx % 3 === 0 ? 'bg-orange-400/20' :
-              idx % 3 === 1 ? 'bg-red-400/20' :
-              'bg-blue-400/20'
-            }`}>
-              <span className="font-typewriter text-xs font-bold">0{idx + 1}</span>
-            </div>
-
-            {/* Content */}
-            <h2 className="font-typewriter text-base leading-relaxed mb-4">
-              {note.title}
-            </h2>
-
-            {/* Footer */}
-            <div className="border-t border-black/5 pt-2 flex justify-between">
-              <span className="text-[10px] font-mono opacity-30">
-                {note.tags?.[0] ? `#${note.tags[0]}` : '#note'}
-              </span>
-              <span className="text-[10px] font-mono opacity-30">
-                {new Date(note.date).toLocaleDateString('en-CA').replace(/-/g, '.')}
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {notes.length === 0 && (
-        <div className="text-center py-20">
-          <p className="font-typewriter text-xl opacity-60">No notes yet. Check back soon!</p>
+    <div className="container-wide animate-slide-up pt-8">
+      {/* Minimal Header */}
+      <div className="mb-8 flex items-center justify-between">
+        <div className="text-[10px] font-mono opacity-40 tracking-[0.2em] uppercase">
+          Archive / Digital Scratchpad
         </div>
-      )}
+      </div>
+
+      {/* Scrapbook Content with Tabs */}
+      <ScrapbookContent notes={notes} />
 
       {/* The Epilogue Section */}
       <div className="mt-20 max-w-xl mx-auto">

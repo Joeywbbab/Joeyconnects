@@ -173,17 +173,19 @@ export default async function WritingPostPage({ params }: PageProps) {
                       {children}
                     </blockquote>
                   ),
+                  pre: ({ children }) => (
+                    <pre className="bg-dark-beige border-2 border-black p-4 my-6 overflow-x-auto font-mono text-sm">
+                      {children}
+                    </pre>
+                  ),
                   code: ({ className, children }) => {
-                    const isInline = !className;
-                    if (isInline) {
-                      return (
-                        <code className="bg-dark-beige border border-black px-2 py-1 rounded text-sm font-mono">
-                          {children}
-                        </code>
-                      );
+                    // Check if inside pre (block code) or inline
+                    const isBlock = className || (typeof children === 'string' && children.includes('\n'));
+                    if (isBlock) {
+                      return <code className="font-mono text-sm">{children}</code>;
                     }
                     return (
-                      <code className="block bg-dark-beige border-2 border-black p-4 my-4 overflow-x-auto font-mono text-sm">
+                      <code className="bg-dark-beige border border-black px-2 py-1 rounded text-sm font-mono">
                         {children}
                       </code>
                     );
@@ -222,7 +224,7 @@ export default async function WritingPostPage({ params }: PageProps) {
                 <h3 className="text-2xl font-bold mb-4">About the Author</h3>
                 <p className="text-gray-700 mb-6">
                   Joey is a problem-solving architect who builds products and writes about ideas.
-                  Currently working on GEO/AEO services at Manus.
+                  Currently working at an AI startup.
                 </p>
                 <a href="/about" className="retro-button">
                   Learn More About Joey

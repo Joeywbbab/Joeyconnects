@@ -1,26 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect } from 'react';
 
 export default function Newsletter() {
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  useEffect(() => {
+    // Load Substack embed script
+    const script = document.createElement('script');
+    script.src = 'https://substackapi.com/widget.js';
+    script.async = true;
+    document.body.appendChild(script);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setStatus('loading');
-
-    // TODO: Replace with actual newsletter API integration (e.g., Buttondown, ConvertKit, Mailchimp)
-    // For now, simulate a successful submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setStatus('success');
-    setEmail('');
-
-    // Reset after 3 seconds
-    setTimeout(() => setStatus('idle'), 3000);
-  };
+    return () => {
+      // Cleanup
+      const existingScript = document.querySelector('script[src="https://substackapi.com/widget.js"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
 
   return (
     <div className="border-t border-dashed border-black/10 mt-16 pt-12">
@@ -31,33 +28,26 @@ export default function Newsletter() {
           Get notified when I publish new posts about GEO, AI, and product building.
         </p>
 
-        {/* Form */}
-        {status === 'success' ? (
-          <div className="bg-green-50 border border-green-200 px-6 py-4 inline-block">
-            <p className="font-typewriter text-sm text-green-700">
-              Thanks for subscribing!
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 justify-center">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              className="px-4 py-3 border border-black/10 font-mono text-sm bg-white/50 focus:outline-none focus:border-red-600 transition-colors w-full sm:w-64"
-              required
-              disabled={status === 'loading'}
-            />
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="bg-black text-white px-6 py-3 font-mono text-xs uppercase tracking-widest hover:bg-red-600 transition-colors disabled:opacity-50"
-            >
-              {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
-            </button>
-          </form>
-        )}
+        {/* Substack Embed Form */}
+        <div id="custom-substack-embed" className="flex justify-center"></div>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.CustomSubstackWidget = {
+                substackUrl: "duoyu4thinking.substack.com",
+                placeholder: "your@email.com",
+                buttonText: "Subscribe",
+                theme: "custom",
+                colors: {
+                  primary: "#000000",
+                  input: "#FFFFFF",
+                  email: "#000000",
+                  text: "#FFFFFF",
+                }
+              };
+            `,
+          }}
+        />
 
         {/* Privacy note */}
         <p className="font-mono text-[10px] opacity-40 mt-4 uppercase tracking-wider">

@@ -25,6 +25,11 @@ const config: Config = {
           blue: '#3b82f6',
           orange: '#f97316',
         },
+        // 直接颜色类 (用于 bg-blue, bg-orange 等)
+        blue: '#3b82f6',
+        orange: '#f97316',
+        beige: '#f4f1ea',
+        'dark-beige': '#e9e4d9',
       },
       fontFamily: {
         sans: ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'],

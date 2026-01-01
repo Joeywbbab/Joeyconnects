@@ -1,8 +1,8 @@
 ---
 title: GEO is SEO for AI Answers (and it's not optional anymore)
 date: 2025-12-23
-tags: [seo, ai, marketing, optimization]
-category: newsletter
+tags: [seo, geo, ai, marketing]
+category: work
 excerpt: If you do marketing long enough, you eventually learn a depressing truth - you don't control the distribution. In the LLM era, if your brand isn't inside that AI-generated paragraph, you can be the best product in the world and still lose.
 ---
 
@@ -180,12 +180,12 @@ What usually matters:
 ### A simple prompt-testing loop
 
 ```
-1) Pick a topic set (your key use cases)
-2) Write prompt variants (reputation / feature / comparison)
-3) Test across models (ChatGPT, Gemini, Perplexity)
-4) Record: mention? position? citation? sentiment?
-5) Ship content improvements
-6) Re-test in 2–4 weeks
+1. Pick a topic set (your key use cases)
+2. Write prompt variants (reputation / feature / comparison)
+3. Test across models (ChatGPT, Gemini, Perplexity)
+4. Record: mention? position? citation? sentiment?
+5. Ship content improvements
+6. Re-test in 2–4 weeks
 ```
 
 ### Referral traffic (when you can get it)

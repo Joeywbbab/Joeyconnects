@@ -57,13 +57,23 @@ export default function AboutPage() {
               {/* Who I Am */}
               <div className="space-y-4 text-sm md:text-base text-gray-800 leading-relaxed">
                 <p>
-                  I'm Joey, a product architect. I build products, write about ideas,
-                  and focus on AEO/GEO services helping brands get discovered by AI search engines.
+                  I'm Joey, a PM at an AI startup.
                 </p>
-                <p>
-                  My philosophy is simple: <strong>I find problems. I build solutions.</strong> No matter
-                  how big a problem seems, I believe there's always a solution if you're willing to look
-                  for it.
+                <ul className="space-y-1.5 list-none">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1.5">•</span>
+                    <span>Care about community, information asymmetry, and education equity</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1.5">•</span>
+                    <span>Build indie products on the side — it's how I explore the game of life</span>
+                  </li>
+                </ul>
+                <p className="pt-2">
+                  My philosophy: <strong>I find problems. I build solutions.</strong>
+                </p>
+                <p className="text-sm text-gray-600 italic">
+                  Leave 20% of life to randomness — after all, life itself is 50% random. Skin in the game. Enjoy.
                 </p>
               </div>
 
@@ -78,20 +88,35 @@ export default function AboutPage() {
               {/* Page fold effect */}
               <div className="hidden md:block absolute top-0 left-0 w-8 h-8 bg-gradient-to-br from-black/5 to-transparent"></div>
 
-              {/* Background */}
+              {/* Interests */}
               <div className="mb-10">
-                <h2 className="font-serif italic text-2xl mb-4 border-b border-black/10 pb-2">Background</h2>
-                <div className="space-y-3 text-sm md:text-base text-gray-800 leading-relaxed">
-                  <p>
-                    My journey has taken me through data analysis, operations, consulting, and AI animation.
-                    Each experience taught me to see problems from different angles and build solutions that work.
-                  </p>
-                  <p>
-                    Currently, I'm focused on helping brands navigate the shift from traditional SEO to
-                    GEO (Generative Engine Optimization) as AI search engines become the new way people
-                    discover information.
-                  </p>
-                </div>
+                <h2 className="font-serif italic text-2xl mb-4 border-b border-black/10 pb-2">Interests</h2>
+                <ul className="space-y-2 text-sm md:text-base text-gray-800">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">•</span>
+                    <span>Favorite book: <em>Antifragile</em> — feels like a life manual</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">•</span>
+                    <span>Wandering through cities on foot, hanging out in coffee shops</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">•</span>
+                    <span>Treating life more like a P than a J</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">•</span>
+                    <span>Music: indie rock, Haydn, Bach</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">•</span>
+                    <span>Life films: <em>Miss Sloane</em> and <em>Whiplash</em></span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">•</span>
+                    <span>Observing humans — it's my favorite hobby</span>
+                  </li>
+                </ul>
               </div>
 
               {/* Connect */}

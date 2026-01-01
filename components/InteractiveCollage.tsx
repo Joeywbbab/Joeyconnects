@@ -33,8 +33,8 @@ const tarotCards = [
 
 // Music tracks
 const musicTracks = [
-  { name: 'Come As You Are', artist: 'Nirvana', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-  { name: 'Merry Christmas Mr. Lawrence', artist: 'Ryuichi Sakamoto', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+  { name: 'Joeyconnects World', artist: 'Joey', url: '/JoeyconnectsworldBGM.mp3' },
+  { name: 'BGM 2', artist: 'Joey', url: '/BGM2.mp3' },
 ];
 
 export default function InteractiveCollage() {
@@ -150,7 +150,8 @@ export default function InteractiveCollage() {
 
     const typeInterval = setInterval(() => {
       if (i < text.length) {
-        setTypedText(prev => prev + text[i]);
+        const char = text[i];
+        setTypedText(prev => prev + char);
         i++;
       } else {
         clearInterval(typeInterval);
@@ -275,16 +276,35 @@ export default function InteractiveCollage() {
           <h1 className="font-serif italic text-3xl md:text-4xl lg:text-5xl leading-[1.1] tracking-tighter mb-4 select-none relative">
             <span className="inline-flex items-center gap-2">
               Hiii
-              <span className="text-3xl md:text-4xl lg:text-5xl">🥂</span>
+              <svg className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" viewBox="0 0 100 100">
+                <g transform="rotate(-15, 35, 50)">
+                  <path d="M20 20 Q20 45, 35 50 Q50 45, 50 20 Z" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                  <path d="M23 28 Q23 42, 35 46 Q47 42, 47 28 Z" fill="#8B0000" opacity="0.8"/>
+                  <line x1="35" y1="50" x2="35" y2="70" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                  <ellipse cx="35" cy="72" rx="12" ry="3" fill="none" stroke="currentColor" strokeWidth="3"/>
+                </g>
+                <g transform="rotate(15, 65, 50)">
+                  <path d="M50 20 Q50 45, 65 50 Q80 45, 80 20 Z" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                  <path d="M53 28 Q53 42, 65 46 Q77 42, 77 28 Z" fill="#8B0000" opacity="0.8"/>
+                  <line x1="65" y1="50" x2="65" y2="70" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                  <ellipse cx="65" cy="72" rx="12" ry="3" fill="none" stroke="currentColor" strokeWidth="3"/>
+                </g>
+                <circle cx="50" cy="25" r="2" fill="#FFD700"/>
+                <circle cx="45" cy="18" r="1.5" fill="#FFD700"/>
+                <circle cx="55" cy="18" r="1.5" fill="#FFD700"/>
+              </svg>
             </span>
             <br />
-            <span className="relative inline-block group">
-              this is Joeyyy
-              <span className="absolute -bottom-2 left-0 h-[2px] w-14 bg-black/20 transition-transform duration-300 group-hover:translate-x-3 group-hover:opacity-80" />
+            <span className="relative inline-block">
+              this is{' '}
+              <span className="relative inline-block">
+                Joeyyy
+                <span className="absolute -bottom-1 left-0 right-0 h-3 bg-yellow-300/70 -rotate-1 -z-10" />
+              </span>
             </span>
           </h1>
           <p className="font-typewriter text-sm md:text-base opacity-70 mb-2">
-            I'm on my way —<br />just finding fun on the road of life.
+            I'm on my way — enjoying the ride.
           </p>
           <p className="font-typewriter text-xs md:text-sm opacity-50 leading-relaxed">
             I find problems. I build solutions.<br />Product architect who believes every challenge has an elegant answer.
@@ -295,7 +315,7 @@ export default function InteractiveCollage() {
         <div className="relative w-[440px] h-[440px] lg:w-[500px] lg:h-[500px] -mt-[40px] lg:-mt-[60px]">
 
           {/* Decorative Circle - shifted right */}
-          <div className="absolute top-[3%] bottom-[3%] left-[17%] right-[-11%] border-2 border-dashed border-red-500/20 rounded-full pointer-events-none"></div>
+          <div className="absolute top-[4%] bottom-[4%] left-[18%] right-[-10%] border-2 border-dashed border-red-500/20 rounded-full pointer-events-none"></div>
 
           {/* Triangle connecting lines - adjusted to match element positions */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -512,16 +532,15 @@ export default function InteractiveCollage() {
                   <div className="font-typewriter text-xs leading-relaxed">
                     {isTyping ? (
                       <>
-                        <div className="opacity-60 mb-1 text-[9px]">sending email to:</div>
-                        <div className="text-red-600 font-bold text-xs">
+                        <div className="opacity-60 mb-1 text-[8px]">signal transmitting:</div>
+                        <div className="text-red-600 font-bold text-[9px]">
                           {typedText}
                           <span className="animate-pulse">|</span>
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className="opacity-50 mb-1 text-[9px] underline">boring office</div>
-                        <div className="opacity-70 text-[10px]">old memory of new time ....</div>
+                        <div className="opacity-70 text-[10px]">transmit a signal</div>
                       </>
                     )}
                   </div>
@@ -556,7 +575,7 @@ export default function InteractiveCollage() {
 
               {/* Label */}
               <div className="absolute -bottom-5 left-3 font-mono text-[8px] tracking-widest uppercase opacity-50">
-                EMAIL MACHINE
+                COSMIC COMMUNICATOR
               </div>
             </div>
           </div>

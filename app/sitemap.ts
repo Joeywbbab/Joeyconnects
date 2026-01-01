@@ -1,14 +1,13 @@
-import { getAllWriting, getAllProjects, getAllNotes } from '@/lib/content';
+import { getAllWriting, getAllProjects } from '@/lib/content';
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://joeyconnects.world';
 
   // Get all content
-  const [writing, projects, notes] = await Promise.all([
+  const [writing, projects] = await Promise.all([
     getAllWriting(),
     getAllProjects(),
-    getAllNotes(),
   ]);
 
   // Static pages
@@ -61,13 +60,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Notes pages
-  const notesPages: MetadataRoute.Sitemap = notes.map((note) => ({
-    url: `${baseUrl}/notes/${note.slug}`,
-    lastModified: new Date(note.date),
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
+  // Notes 没有独立的动态路由页面，所以不需要生成单独的 sitemap 条目
+  // 它们在 /notes 页面以 modal 形式展示
 
-  return [...staticPages, ...writingPages, ...projectPages, ...notesPages];
+  return [...staticPages, ...writingPages, ...projectPages];
 }

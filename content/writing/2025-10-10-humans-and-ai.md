@@ -2,7 +2,7 @@
 title: Thinking About Humans and AI - Humans Are Being Algorithmized, AI Is Being Socialized
 date: 2025-10-10
 tags: [thoughts, ai]
-category: blog
+category: thoughts
 excerpt: We talk a lot about how humans should use AI, but rarely about how both sides are learning from each other. A reflection on that loop.
 ---
 

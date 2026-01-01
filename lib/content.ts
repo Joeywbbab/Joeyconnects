@@ -19,8 +19,25 @@ export interface Note {
   slug: string;
   title: string;
   date: string;
+  category: 'thoughts' | 'growth' | 'reviews' | 'inspiration';
   content: string;
   tags?: string[];
+  image?: string;
+  video?: string;
+  lang?: 'en' | 'zh';
+}
+
+export interface ProjectTimeline {
+  date: string;
+  title: string;
+  description?: string;
+}
+
+export interface EmbedVersion {
+  version: string;
+  label: string;
+  url: string;
+  description?: string;
 }
 
 export interface Project {
@@ -34,6 +51,17 @@ export interface Project {
   demoUrl?: string;
   githubUrl?: string;
   status: 'active' | 'in-progress' | 'archived';
+  // New fields
+  category: 'work' | 'tools' | 'experiments';
+  coverImage?: string;
+  embedType?: 'local' | 'external' | 'none';
+  embedUrl?: string;
+  embedHeight?: string;
+  embedVersions?: EmbedVersion[];
+  timeline?: ProjectTimeline[];
+  createdAt?: string;
+  updatedAt?: string;
+  relatedPosts?: string[];
   content: string;
 }
 
@@ -115,8 +143,12 @@ export async function getAllNotes(): Promise<Note[]> {
         slug,
         title: data.title || '',
         date: data.date || '',
+        category: data.category || 'inspiration',
         content,
         tags: data.tags || [],
+        image: data.image,
+        video: data.video,
+        lang: data.lang || 'en',
       };
     })
     .sort((a, b) => (new Date(b.date).getTime() - new Date(a.date).getTime()));
@@ -138,8 +170,12 @@ export async function getNoteBySlug(slug: string): Promise<Note | null> {
     slug,
     title: data.title || '',
     date: data.date || '',
+    category: data.category || 'inspiration',
     content,
     tags: data.tags || [],
+    image: data.image,
+    video: data.video,
+    lang: data.lang || 'en',
   };
 }
 
@@ -172,6 +208,16 @@ export async function getAllProjects(): Promise<Project[]> {
         demoUrl: data.demoUrl,
         githubUrl: data.githubUrl,
         status: data.status || 'active',
+        category: data.category || 'tools',
+        coverImage: data.coverImage,
+        embedType: data.embedType || 'none',
+        embedUrl: data.embedUrl,
+        embedHeight: data.embedHeight || '500px',
+        embedVersions: data.embedVersions || [],
+        timeline: data.timeline || [],
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        relatedPosts: data.relatedPosts || [],
         content,
       };
     });
@@ -200,6 +246,16 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     demoUrl: data.demoUrl,
     githubUrl: data.githubUrl,
     status: data.status || 'active',
+    category: data.category || 'tools',
+    coverImage: data.coverImage,
+    embedType: data.embedType || 'none',
+    embedUrl: data.embedUrl,
+    embedHeight: data.embedHeight || '500px',
+    embedVersions: data.embedVersions || [],
+    timeline: data.timeline || [],
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+    relatedPosts: data.relatedPosts || [],
     content,
   };
 }

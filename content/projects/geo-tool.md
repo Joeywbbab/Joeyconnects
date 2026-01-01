@@ -1,8 +1,8 @@
 ---
-title: GEO Tool
+title: Generative Engine Optimization (GEO Application)
 description: Monitor and optimize your brand visibility in AI search engines
-problem: Brands struggle to track their visibility in AI-powered search engines like ChatGPT and Perplexity
-solution: A monitoring and optimization tool specifically designed for Generative Engine Optimization (GEO)
+problem: Brands struggle to track their visibility in AI-powered search engines like ChatGPT and Perplexity. SEO tools were built to reverse-engineer Google, but LLMs operate differently — they synthesize, not rank.
+solution: A monitoring and optimization tool specifically designed for Generative Engine Optimization (GEO), helping brands understand how AI engines perceive and present them.
 features:
   - Query your brand across multiple AI engines
   - Track visibility scores over time
@@ -15,51 +15,66 @@ tech:
   - Anthropic API
   - Supabase
 status: in-progress
+category: work
+embedType: external
+embedHeight: 650px
+embedVersions:
+  - version: V1
+    label: Basic SaaS
+    url: https://aeo-1-0.vercel.app/dashboard
+    description: Core monitoring, classic SaaS interface
+  - version: V2
+    label: Analysis Agent
+    url: https://amplift.vercel.app/visibility/overview
+    description: Deeper analysis with agent-assisted insights
+createdAt: 2024-11-01
+updatedAt: 2025-01-01
+timeline:
+  - date: 2024-11-01
+    title: Project Kickoff
+    description: Initial research and architecture planning
+  - date: 2024-11-20
+    title: Core Engine Built
+    description: Multi-model query system implemented
+  - date: 2024-12-15
+    title: V1 Dashboard MVP
+    description: Basic visibility tracking, SaaS-style interface
+  - date: 2025-01-01
+    title: V2 with Analysis Agent
+    description: Added deeper analysis capabilities and agent-assisted insights
+relatedPosts:
+  - 2025-12-23-mastering-geo-guide
+  - 2025-12-28-from-search-optimization-to-ai-cognition-management
 ---
 
-## The Problem
+## Prototypes
 
-SEO is evolving. More people are using AI chatbots like ChatGPT, Claude, and Perplexity to search for information instead of Google. But brands have no idea if they're being mentioned by these AI engines.
+**Version 1** — [aeo-1-0.vercel.app](https://aeo-1-0.vercel.app/dashboard)
+Basic GEO functionality with a clean SaaS-style interface. Focuses on core monitoring features that align with typical overseas product patterns.
 
-**Key challenges:**
-- No visibility into AI search results
-- No way to track brand mentions
-- No clear optimization strategy for AI engines
+**Version 2** — [amplift.vercel.app](https://amplift.vercel.app/visibility/overview)
+Enhanced with deeper analysis capabilities and agent-assisted insights. Moves beyond simple monitoring into actionable intelligence.
 
-## The Solution
+### What Changed Between Versions
 
-GEO Tool helps brands monitor and optimize their presence in AI search engines.
-
-### Features
-
-**Visibility Monitoring**
-- Query multiple AI engines automatically
-- Track when and how your brand is mentioned
-- Monitor sentiment and context
-
-**Optimization Insights**
-- Get actionable recommendations
-- Identify content gaps
-- Track optimization progress
-
-**Competitive Analysis**
-- See how competitors rank
-- Identify opportunities
-- Benchmark performance
+| Aspect | V1 | V2 |
+|--------|-----|-----|
+| Focus | Core monitoring | Analysis + insights |
+| Interface | Classic SaaS dashboard | Analysis-first design |
+| Intelligence | Rule-based recommendations | Agent-assisted analysis |
+| Target | Basic visibility tracking | Strategic optimization |
 
 ## How It Works
 
-1. **Set up queries** - Define what questions people might ask about your brand
-2. **Run checks** - Automatically query AI engines on a schedule
-3. **Analyze results** - Get detailed reports on visibility and sentiment
-4. **Optimize** - Implement recommendations and track improvements
+1. **Set up queries** — Define what questions people might ask about your brand
+2. **Run checks** — Automatically query AI engines on a schedule
+3. **Analyze results** — Get detailed reports on visibility and sentiment
+4. **Optimize** — Implement recommendations and track improvements
 
 ## Current Status
 
-This project is currently in development. Building the core monitoring engine and optimization framework.
-
-Expected launch: Q1 2026
+This project is currently in active development. V2 is live with agent-assisted analysis capabilities.
 
 ---
 
-Interested in early access? [Contact me](/about)
+Interested in early access? [Contact me](mailto:hello@joeyconnects.world)
