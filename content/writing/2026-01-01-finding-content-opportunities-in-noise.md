@@ -3,14 +3,39 @@ title: Finding Content Opportunities in Noise
 date: 2026-01-01
 tags: [marketing, research, workflow]
 category: work
+description: A practical framework for turning messy Reddit discussions into a systematic content roadmap, plus early results and what still needs validation.
 excerpt: Most content marketing is guesswork. Here's an attempt to make it systematic—by mapping Reddit discussions to a framework that works across industries. Research in progress.
 ---
 
 Most content teams operate on intuition. Someone reads a few blog posts, checks what competitors are doing, maybe scrolls Reddit for an hour, and comes up with a content calendar. It works, kind of. But it doesn't scale, and it's hard to know if you're missing obvious opportunities.
 
+This article focuses on a **"opportunity product"** approach to content: content designed to fill demand gaps in a category. It is more useful for products and teams than for individuals, especially influencers. For a personal creator, this framework might feel heavy or even counterproductive.
+
+In practice, the contrast is:
+- **Opportunity content** (this article): map a category, find gaps, and build a coverage plan around demand.
+- **Creator content** (personal/influencer): lead with taste and narrative; choose topics that reinforce your voice, not necessarily the biggest gaps.
+
 I've been working on something different: a systematic way to discover content opportunities from unstructured social discussions. The core idea is simple—what if you could take thousands of Reddit posts, cluster them into topics, and map them onto a framework that tells you exactly where the gaps are?
 
+My working hypothesis is:
+1) For any category (e.g. AI coding editors, project management tools), the set of **topics is exhaustible**.
+2) In this article, a "topic" means a problem definition that sits at the intersection of user journey stage and product aspect.
+3) Topics derived from social discussions are user-voice grounded, and volume indicates which problems matter most.
+4) For any specific product, its content topics are a **subset** of the category topic set.
+
+That gives two practical uses:
+- Use the category topic map to structure your content layout, focusing on where you already play and on related topics you can expand into.
+- Use your existing content coverage to see what users care about most, then decide what to fix or build next.
+
+![Framework flow from social sources to content opportunities](/images/writing/finding-content-opportunities-flow.png)
+
 This is still research in progress. Maybe 60% figured out. But the parts that work are interesting enough to share.
+
+## TL;DR
+
+- Use a 7×8 matrix (journey stage × product aspect) to structure content opportunities.
+- Cluster Reddit discussions into topics and map them to the matrix cells.
+- The empty cells point to high-intent gaps you can fill with targeted content.
 
 ## The Problem With "Just Listen to Your Users"
 
@@ -100,18 +125,15 @@ The actual process has five steps:
 
 Here's a sample from the AI code editor analysis:
 
-```
-FRAMEWORK MATRIX (Posts per Cell)
-            | core_fun | model_ca | performa | usabil. | pricing | integrat |
-------------+----------+----------+----------+---------+---------+----------+
-awareness   |   ██░░   |   ----   |   ----   |   ----  |   ----  |   ----   |
-considerat  |   ████   |   ████   |   ████   |   ----  |   █░░░  |   ██░░   |
-decision    |   █░░░   |   ███░   |   █░░░   |   ----  |   ██░░  |   ----   |
-onboarding  |   ----   |   ----   |   ----   |   ███░  |   ----  |   ----   |
-usage       |   ████   |   ███░   |   █░░░   |   ████  |   ----  |   ----   |
-troublesho  |   ████   |   █░░░   |   ███░   |   ██░░  |   ██░░  |   ----   |
-advanced    |   ----   |   ----   |   ██░░   |   ----  |   ----  |   ----   |
-```
+| Stage | core_fun | model_ca | performa | usabil. | pricing | integrat |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| awareness | ██░░ | ---- | ---- | ---- | ---- | ---- |
+| considerat | ████ | ████ | ████ | ---- | █░░░ | ██░░ |
+| decision | █░░░ | ███░ | █░░░ | ---- | ██░░ | ---- |
+| onboarding | ---- | ---- | ---- | ███░ | ---- | ---- |
+| usage | ████ | ███░ | █░░░ | ████ | ---- | ---- |
+| troublesho | ████ | █░░░ | ███░ | ██░░ | ██░░ | ---- |
+| advanced | ---- | ---- | ██░░ | ---- | ---- | ---- |
 
 The filled cells show where discussions are happening. The empty cells are potential content opportunities—topics users care about but aren't being addressed.
 
@@ -137,7 +159,8 @@ These tell you not just what to write about, but what angles matter. If "Cursor 
 
 ## Case Study: Manus
 
-I ran the full pipeline for Manus, an AI agent product. Input: 246 Reddit posts from AI/automation subreddits + analysis of 13 pages on their website.
+I ran the full pipeline for Manus, an AI agent product.
+**Input:** 246 Reddit posts from AI/automation subreddits + analysis of 13 pages on their website.
 
 Key finding: 96 posts discussed the consideration stage (people comparing Manus to alternatives), but the website had zero comparison content. That's a significant gap.
 
@@ -155,8 +178,6 @@ This isn't just "write more content." It's "write this specific content, in this
 ## What's Still Uncertain
 
 I said this is 60% figured out. Here's what's still unclear:
-
-**Framework granularity.** Is 7×8 the right size? Maybe 4×5 is enough for simpler products. Maybe some dimensions should be combined. The data suggests the current framework works, but I haven't tested edge cases.
 
 **Validation mechanism.** For website content, you'd want to validate with search volume data before investing in production. The pipeline identifies opportunities but doesn't tell you which ones have SEO potential. That's a separate problem.
 
