@@ -3,7 +3,7 @@ title: GEO is SEO for AI Answers (and it's not optional anymore)
 date: 2025-12-23
 tags: [seo, geo, ai, marketing]
 category: work
-description: A practical guide to GEO: how AI answers change distribution, what to measure, and how to structure content so LLMs can extract and cite it.
+description: "A practical guide to GEO: how AI answers change distribution, what to measure, and how to structure content so LLMs can extract and cite it."
 excerpt: If you do marketing long enough, you eventually learn a depressing truth - you don't control the distribution. In the LLM era, if your brand isn't inside that AI-generated paragraph, you can be the best product in the world and still lose.
 ---
 
