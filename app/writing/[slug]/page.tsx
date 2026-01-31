@@ -79,15 +79,15 @@ export default async function WritingPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={renderSchema(schema)}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="flex gap-12 items-start">
           {/* Left Sidebar - Table of Contents */}
           <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-28 h-fit">
             <TableOfContents content={post.content} />
           </aside>
 
           {/* Main Article */}
-          <article className="flex-1 w-full max-w-3xl min-w-0">
+          <article className="flex-1 max-w-3xl">
             {/* Article Header */}
             <header className="mb-12">
               <div className="mb-4 flex items-center gap-3 text-sm text-gray-600">
@@ -103,12 +103,12 @@ export default async function WritingPostPage({ params }: PageProps) {
                 </span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6">
                 {post.title}
               </h1>
 
               {post.description && (
-                <p className="text-lg sm:text-xl text-gray-700 leading-relaxed">
+                <p className="text-xl text-gray-700 leading-relaxed">
                   {post.description}
                 </p>
               )}
@@ -128,19 +128,19 @@ export default async function WritingPostPage({ params }: PageProps) {
             </header>
 
             {/* Article Content */}
-            <div className="prose prose-base sm:prose-lg max-w-none break-words">
+            <div className="prose prose-lg max-w-none">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkBreaks]}
                 components={{
                   h1: ({ children }) => (
-                    <h1 className="text-3xl sm:text-4xl font-bold mt-12 mb-6 border-b-2 border-black pb-4">
+                    <h1 className="text-4xl font-bold mt-12 mb-6 border-b-2 border-black pb-4">
                       {children}
                     </h1>
                   ),
                   h2: ({ children }) => {
                     const id = generateHeadingId(children);
                     return (
-                      <h2 id={id} className="text-2xl sm:text-3xl font-bold mt-10 mb-4 scroll-mt-28">
+                      <h2 id={id} className="text-3xl font-bold mt-10 mb-4 scroll-mt-28">
                         {children}
                       </h2>
                     );
@@ -148,33 +148,33 @@ export default async function WritingPostPage({ params }: PageProps) {
                   h3: ({ children }) => {
                     const id = generateHeadingId(children);
                     return (
-                      <h3 id={id} className="text-xl sm:text-2xl font-bold mt-8 mb-3 scroll-mt-28">
+                      <h3 id={id} className="text-2xl font-bold mt-8 mb-3 scroll-mt-28">
                         {children}
                       </h3>
                     );
                   },
                   p: ({ children }) => (
-                    <p className="text-base sm:text-lg leading-relaxed mb-6 text-gray-800">
+                    <p className="text-lg leading-relaxed mb-6 text-gray-800">
                       {children}
                     </p>
                   ),
                   ul: ({ children }) => (
-                    <ul className="list-disc list-inside mb-6 space-y-2 text-base sm:text-lg text-gray-800">
+                    <ul className="list-disc list-inside mb-6 space-y-2 text-lg text-gray-800">
                       {children}
                     </ul>
                   ),
                   ol: ({ children }) => (
-                    <ol className="list-decimal list-inside mb-6 space-y-2 text-base sm:text-lg text-gray-800">
+                    <ol className="list-decimal list-inside mb-6 space-y-2 text-lg text-gray-800">
                       {children}
                     </ol>
                   ),
                   blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-orange pl-6 italic my-6 text-base sm:text-lg text-gray-700">
+                    <blockquote className="border-l-4 border-orange pl-6 italic my-6 text-gray-700">
                       {children}
                     </blockquote>
                   ),
                   pre: ({ children }) => (
-                    <pre className="bg-dark-beige border-2 border-black p-4 my-6 overflow-x-auto font-mono text-sm sm:text-base">
+                    <pre className="bg-dark-beige border-2 border-black p-4 my-6 overflow-x-auto font-mono text-sm">
                       {children}
                     </pre>
                   ),
